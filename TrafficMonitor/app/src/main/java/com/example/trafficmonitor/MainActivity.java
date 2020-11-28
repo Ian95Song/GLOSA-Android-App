@@ -1,16 +1,19 @@
 package com.example.trafficmonitor;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.Locale;
-
 public class MainActivity extends AppCompatActivity {
 
     /*Timer Functions*/
@@ -61,11 +64,41 @@ public class MainActivity extends AppCompatActivity {
 
     /*GPS Information*/
 
-    /*Http Client and JSON Parser (Yuanheng)*/
+    /*Http Client and Map Info JSON Parser (Yuanheng)*/
     //lste[length-1]
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void clientMapInfoTest() {
+        Runnable runnable = new Runnable(){
+            public void run() {
+                try {
+                    MapInfo mapInfo = Utils.mapInfoParser(Utils.getMapInfoJson());
+                    Log.i("Client MapInfo", String.valueOf(mapInfo.map.intersection.intersectionID));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        Thread thread = new Thread(runnable);
+        thread.start();
+    }
     private static TextView m_JSONObject;
-    /*Http Client and JSON Parser (Yuanheng)*/
-
+    /*Http Client and Spat JSON Parser (Yuanheng)*/
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void clientSpatTest() {
+        Runnable runnable = new Runnable(){
+            public void run() {
+                try {
+                    Spat spat = Utils.spatParser(Utils.getSpatJson()); // need almost 12 sec to get json from api
+                    Log.i("Client Spat", String.valueOf(spat.intersectionStates.get(0).movementStates.size()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        Thread thread = new Thread(runnable);
+        thread.start();
+    }
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +116,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         updateCountDownText();
+        //clientMapInfoTest();
+        //clientSpatTest();
     }
 
 }

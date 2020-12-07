@@ -2,7 +2,6 @@ package com.example.trafficmonitor;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -13,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 public class MainActivity extends AppCompatActivity {
 
@@ -64,16 +64,26 @@ public class MainActivity extends AppCompatActivity {
 
     /*GPS Information*/
 
-    /*Http Client and Map Info JSON Parser (Yuanheng)*/
-    //lste[length-1]
+    /*Http Client and JSON Parser of Map Info(Yuanheng)*/
+    private static TextView m_MapInfo;
+    // Async processing
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void clientMapInfoTest() {
+    private void updateMapInfoText() {
         Runnable runnable = new Runnable(){
             public void run() {
                 try {
-                    MapInfo mapInfo = Utils.mapInfoParser(Utils.getMapInfoJson());
-                    Log.i("Client MapInfo", String.valueOf(mapInfo.map.intersection.intersectionID));
-                } catch (IOException e) {
+                    String mapInfoStr = Utils.getMapInfoJson();
+                    MapInfo mapInfo = Utils.mapInfoParser(mapInfoStr);
+                    int intersectionID = mapInfo.map.intersection.intersectionID;
+                    //Update view at main thread
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            m_MapInfo.setText("Intersevtion ID: " + String.valueOf(intersectionID));
+                        }
+                    });
+                } catch (Exception e) {
+                    Log.w("Client","Invalid Authorization or Server down. Please check AuthUrlInfo");
                     e.printStackTrace();
                 }
             }
@@ -81,16 +91,28 @@ public class MainActivity extends AppCompatActivity {
         Thread thread = new Thread(runnable);
         thread.start();
     }
-    private static TextView m_JSONObject;
-    /*Http Client and Spat JSON Parser (Yuanheng)*/
+    /*Http Client and JSON Parser of Spat(Yuanheng)*/
+    //list[0]
+    private static TextView m_Spat;
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void clientSpatTest() {
-        Runnable runnable = new Runnable(){
+    // Async processing
+    public void updateSpatText() {
+        Runnable runnable = new Runnable() {
             public void run() {
                 try {
-                    Spat spat = Utils.spatParser(Utils.getSpatJson()); // need almost 12 sec to get json from api
-                    Log.i("Client Spat", String.valueOf(spat.intersectionStates.get(0).movementStates.size()));
-                } catch (IOException e) {
+                    String spatStr = Utils.getSpatJson();
+                    Spat spat = Utils.spatParser(spatStr);
+                    List<MovementState> movementStates = spat.intersectionStates.get(0).movementStates;
+                    String lastGroupState = movementStates.get(movementStates.size()-1).movementEvents.get(1).phaseState;
+                    //Update view at main thread
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            m_Spat.setText("Last Group: " + lastGroupState);
+                        }
+                    });
+                } catch (Exception e) {
+                    Log.w("Client","Invalid Authorization or Server down. Please check AuthUrlInfo");
                     e.printStackTrace();
                 }
             }
@@ -98,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
         Thread thread = new Thread(runnable);
         thread.start();
     }
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +130,8 @@ public class MainActivity extends AppCompatActivity {
         m_textViewCountDown = findViewById(R.id.textView5);
         m_btnStartSimulation = findViewById(R.id.button);
         m_gpsInformation = findViewById(R.id.textView8);
-        m_JSONObject = findViewById(R.id.textView9);
+        m_MapInfo = findViewById(R.id.textView9);
+        m_Spat = findViewById(R.id.textView10);
 
         m_btnStartSimulation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,8 +140,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         updateCountDownText();
-        //clientMapInfoTest();
-        //clientSpatTest();
+        updateMapInfoText();
+        updateSpatText();
     }
 
 }

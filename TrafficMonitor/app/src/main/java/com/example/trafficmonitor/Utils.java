@@ -24,7 +24,8 @@ public class Utils {
         String basicAuth = AuthUrlInfo.getBasicAuth();
         String encodedAuth = "Basic " + Base64.getEncoder().encodeToString(basicAuth.getBytes(StandardCharsets.UTF_8));
         URL url = new URL(mapInfoUrl);
-        URLConnection con = url.openConnection(); con.setRequestProperty("Authorization", encodedAuth);
+        URLConnection con = url.openConnection();
+        con.setRequestProperty("Authorization", encodedAuth);
         InputStream is = con.getInputStream();
         BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
         StringBuilder sb = new StringBuilder(); int cp;
@@ -41,7 +42,8 @@ public class Utils {
         String basicAuth = AuthUrlInfo.getBasicAuth();
         String encodedAuth = "Basic " + Base64.getEncoder().encodeToString(basicAuth.getBytes(StandardCharsets.UTF_8));
         URL url = new URL(mapInfoUrl);
-        URLConnection con = url.openConnection(); con.setRequestProperty("Authorization", encodedAuth);
+        URLConnection con = url.openConnection();
+        con.setRequestProperty("Authorization", encodedAuth);
         InputStream is = con.getInputStream();
         BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
         StringBuilder sb = new StringBuilder();

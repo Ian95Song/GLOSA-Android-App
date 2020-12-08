@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            m_MapInfo.setText("Intersevtion ID: " + String.valueOf(intersectionID));
+                            m_MapInfo.setText("Intersection ID: " + String.valueOf(intersectionID));
                         }
                     });
                 } catch (Exception e) {
@@ -92,25 +92,33 @@ public class MainActivity extends AppCompatActivity {
         thread.start();
     }
     /*Http Client and JSON Parser of Spat(Yuanheng)*/
-    //list[0]
+    // State and left Time of last signal group
     private static TextView m_Spat;
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    //Update view at main thread
+    public void updateSpatText(Phases phasesLastSignalGroup) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                CurrentState currentState = phasesLastSignalGroup.getCurrentState();
+                m_Spat.setText("Signal Group: "+currentState.signalGroupId+" "
+                        +currentState.state+" Left: "+currentState.timeLefts+" s");
+            }
+        });
+    }
     // Async processing
-    public void updateSpatText() {
+    public void requestSpat() {
         Runnable runnable = new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             public void run() {
                 try {
-                    String spatStr = Utils.getSpatJson();
+                    String spatStr = Utils.getSpatJson(); // need almost 12s
                     Spat spat = Utils.spatParser(spatStr);
                     List<MovementState> movementStates = spat.intersectionStates.get(0).movementStates;
-                    String lastGroupState = movementStates.get(movementStates.size()-1).movementEvents.get(1).phaseState;
-                    //Update view at main thread
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            m_Spat.setText("Last Group: " + lastGroupState);
-                        }
-                    });
+                    Long timestamp = spat.timestamp;
+                    int signalGroupId = movementStates.get(0).signalGroupId;
+                    List<MovementEvent> movementEvents = movementStates.get(0).movementEvents;
+                    Phases phasesLastSignalGroup = new Phases(timestamp,signalGroupId,movementEvents);
+                    updateSpatText(phasesLastSignalGroup);
                 } catch (Exception e) {
                     Log.w("Client","Invalid Authorization or Server down. Please check AuthUrlInfo");
                     e.printStackTrace();
@@ -141,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
         });
         updateCountDownText();
         updateMapInfoText();
-        updateSpatText();
+        requestSpat();
     }
 
 }

@@ -78,6 +78,8 @@ public class MainActivity extends AppCompatActivity {
     static MainActivity instance;
     LocationRequest locationRequest;
     FusedLocationProviderClient fusedLocationProviderClient;
+    double utmLocationEasting;
+    double utmLocationNorthing;
 
     public static MainActivity getInstance() {
         return instance;
@@ -95,7 +97,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void updateTextView(String value){
+    // update textview, just for testing
+    public void updateTextView(String value) {
         MainActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -104,19 +107,26 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
-    private PendingIntent getPendingIntent() {
-        Intent intent = new Intent(this,LocationService.class);
-        intent.setAction(LocationService.ACTION_PROCESS_UPDATE);
-        return PendingIntent.getBroadcast(this,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+    //update the UTM Location Information for further use
+    public void updateUtmLocation(double easting, double northing) {
+        this.utmLocationEasting = easting;
+        this.utmLocationNorthing = northing;
     }
 
+
+    private PendingIntent getPendingIntent() {
+        Intent intent = new Intent(this, LocationService.class);
+        intent.setAction(LocationService.ACTION_PROCESS_UPDATE);
+        return PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    //set the time interval and distance interval of request
     private void buildLocationRequest() {
         locationRequest = new LocationRequest();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(1000);
-        locationRequest.setFastestInterval(1000);
-        locationRequest.setSmallestDisplacement(0);
+        locationRequest.setInterval(1000); // in milliseconds (1ms = 0.001s)
+        locationRequest.setFastestInterval(1000); // in milliseconds (1ms = 0.001s)
+        locationRequest.setSmallestDisplacement(0.5f); // in meters
     }
 
     /*GPS Information*/
@@ -171,7 +181,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
-
-
 }
+
+

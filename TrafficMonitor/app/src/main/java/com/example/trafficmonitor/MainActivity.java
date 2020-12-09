@@ -3,6 +3,11 @@ package com.example.trafficmonitor;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Build;
+import androidx.core.app.ActivityCompat;
+import android.Manifest;
+import android.app.PendingIntent;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
@@ -10,6 +15,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.io.IOException;
 import java.util.List;
@@ -22,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private CountDownTimer m_countDownTimer;
     private long m_timeLeftInMillis = 6000;
 
-    private void timer(){
+    private void timer() {
         m_countDownTimer = new CountDownTimer(m_timeLeftInMillis, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -38,9 +54,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }.start();
     }
-    private void updateCountDownText(){
+
+    private void updateCountDownText() {
         int seconds = (int) (m_timeLeftInMillis / 1000) % 60;
-        String timeLeftFormatted = String.format(Locale.getDefault(),"%02d", seconds);
+        String timeLeftFormatted = String.format(Locale.getDefault(), "%02d", seconds);
         m_textViewCountDown.setText(timeLeftFormatted);
     }
     /*Timer Functions*/
@@ -50,17 +67,60 @@ public class MainActivity extends AppCompatActivity {
     private int current_image;
     int[] images = {R.drawable.red, R.drawable.red_yellow, R.drawable.yellow, R.drawable.green};
 
-    public void updateTrafficLight(){
-        m_imageView = (ImageView)findViewById(R.id.imageView3);
+    public void updateTrafficLight() {
+        m_imageView = (ImageView) findViewById(R.id.imageView3);
         current_image++;
-        current_image=current_image % images.length;
+        current_image = current_image % images.length;
         m_imageView.setImageResource(images[current_image]);
     }
     /*Traffic Light Functions*/
 
     /*GPS Information (Yiyang)*/
-    private static TextView m_gpsInformation;
 
+    private static TextView m_gpsInformation;
+    static MainActivity instance;
+    LocationRequest locationRequest;
+    FusedLocationProviderClient fusedLocationProviderClient;
+
+    public static MainActivity getInstance() {
+        return instance;
+    }
+
+
+    private void updateLocation() {
+        buildLocationRequest();
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, getPendingIntent());
+
+    }
+
+    public void updateTextView(String value){
+        MainActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                m_gpsInformation.setText(value);
+            }
+        });
+    }
+
+
+    private PendingIntent getPendingIntent() {
+        Intent intent = new Intent(this,LocationService.class);
+        intent.setAction(LocationService.ACTION_PROCESS_UPDATE);
+        return PendingIntent.getBroadcast(this,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    private void buildLocationRequest() {
+        locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(0);
+        locationRequest.setFastestInterval(0);
+        locationRequest.setSmallestDisplacement(0);
+    }
 
     /*GPS Information*/
 
@@ -148,8 +208,34 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         updateCountDownText();
+
+        /*by Yuanheng*/
         updateMapInfoText();
         requestSpat();
+
+        /*by Yiyang*/
+        instance = this;
+        //ask permission for GPS Information request
+        Dexter.withContext(this)
+                .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                .withListener(new PermissionListener() {
+                    @Override
+                    public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
+                        updateLocation();
+                    }
+
+                    @Override
+                    public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+                        Toast.makeText(MainActivity.this, "You need to accept Location request", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+
+                    }
+                }).check();
     }
+
+
 
 }

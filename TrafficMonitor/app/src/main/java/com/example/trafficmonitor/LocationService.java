@@ -25,6 +25,8 @@ public class LocationService extends BroadcastReceiver {
                     String location_string = new StringBuilder(""+location.getLatitude())
                             .append("/")
                             .append(location.getLongitude())
+                            .append("/")
+                            .append(location.getSpeed())
                             .toString();
 
                     try{

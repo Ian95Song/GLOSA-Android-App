@@ -23,17 +23,23 @@ public class LocationService extends BroadcastReceiver {
                 if (result!=null){
                     Location location = result.getLastLocation();
                     Deg2UTM utmLocation = new Deg2UTM(location.getLatitude(),location.getLongitude());
+
+                    /*only used for Textview for function testing  */
                     String location_string = new StringBuilder(""+utmLocation.Easting)
                             .append("/")
                             .append(utmLocation.Northing)
                             .append("/")
                             .append(location.getSpeed())
                             .toString();
+                    /*only used for Textview for function testing  */
 
                     try{
-                        MainActivity.getInstance().updateTextView(location_string);//only for testing
-                        MainActivity.getInstance().updateUtmLocation(utmLocation.Easting,utmLocation.Northing); //for further use
+                        /*only used for Textview for function testing  */
+                        MainActivity.getInstance().updateTextView(location_string);
+                        /*only used for Textview for function testing  */
 
+                        MainActivity.getInstance().updateUtmLocation(utmLocation.Easting,utmLocation.Northing); //for further use
+                        MainActivity.getInstance().updateSpeedInfo(location.getSpeed());
 
                     }catch (Exception ex){
                         Toast.makeText(context, location_string, Toast.LENGTH_SHORT).show();

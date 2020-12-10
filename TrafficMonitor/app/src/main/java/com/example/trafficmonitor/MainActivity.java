@@ -81,6 +81,9 @@ public class MainActivity extends AppCompatActivity {
     static MainActivity instance;
     LocationRequest locationRequest;
     FusedLocationProviderClient fusedLocationProviderClient;
+    double utmLocationEasting;  // in meters
+    double utmLocationNorthing; // in meters
+    float currentSpeed; //in m/s
 
     public static MainActivity getInstance() {
         return instance;
@@ -98,7 +101,36 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void updateTextView(String value){
+    private PendingIntent getPendingIntent() {
+        Intent intent = new Intent(this, LocationService.class);
+        intent.setAction(LocationService.ACTION_PROCESS_UPDATE);
+        return PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    //set the time interval and distance interval of request
+    private void buildLocationRequest() {
+        locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(1000); // in milliseconds (1ms = 0.001s)
+        locationRequest.setFastestInterval(1000); // in milliseconds (1ms = 0.001s)
+        locationRequest.setSmallestDisplacement(0.5f); // in meters
+    }
+
+
+    //update current UTM Location Information for further use
+    public void updateUtmLocation(double easting, double northing) {
+        this.utmLocationEasting = easting;
+        this.utmLocationNorthing = northing;
+    }
+
+    //update current speed Information for further use
+    public void updateSpeedInfo(float speed) {
+        this.currentSpeed = speed;
+    }
+
+
+    /*only used for Textview for function testing  */
+    public void updateTextView(String value) {
         MainActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -106,21 +138,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-
-    private PendingIntent getPendingIntent() {
-        Intent intent = new Intent(this,LocationService.class);
-        intent.setAction(LocationService.ACTION_PROCESS_UPDATE);
-        return PendingIntent.getBroadcast(this,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
-    }
-
-    private void buildLocationRequest() {
-        locationRequest = new LocationRequest();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(1000);
-        locationRequest.setFastestInterval(1000);
-        locationRequest.setSmallestDisplacement(0);
-    }
+    /*only used for Textview for function testing  */
 
     /*GPS Information*/
 
@@ -236,6 +254,6 @@ public class MainActivity extends AppCompatActivity {
                 }).check();
     }
 
-
-
 }
+
+

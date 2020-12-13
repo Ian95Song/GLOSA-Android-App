@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.trafficmonitor">
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -9,8 +12,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TrafficMonitor">
+<<<<<<< HEAD
 
         <activity android:name=".SplashScreen">
+=======
+        <receiver
+            android:name=".LocationService"/>
+
+        <activity android:name=".MainActivity">
+>>>>>>> 70b4b281b231440421aea118b86833c11ff4c825
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

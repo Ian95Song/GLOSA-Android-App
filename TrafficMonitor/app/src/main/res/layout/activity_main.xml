@@ -41,6 +41,7 @@
         android:layout_marginTop="232dp"
         android:layout_marginBottom="294dp"
         app:layout_constraintBottom_toBottomOf="parent"
+<<<<<<< HEAD
         app:layout_constraintEnd_toStartOf="@+id/imageButton3"
         app:layout_constraintStart_toEndOf="@+id/imageButton"
         app:layout_constraintTop_toBottomOf="@+id/textView13"
@@ -58,4 +59,39 @@
         app:layout_constraintTop_toBottomOf="@+id/textView13"
         app:srcCompat="@drawable/walking_icon"
         android:contentDescription="TODO" />
+=======
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.075"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView5"
+        app:layout_constraintVertical_bias="0.136" />
+
+    <TextView
+        android:id="@+id/textView9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Map Info"
+        android:textColor="@color/black"
+        android:textSize="25dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.059"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView8"
+        app:layout_constraintVertical_bias="0.134" />
+    <TextView
+        android:id="@+id/textView10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Spat"
+        android:textColor="@color/black"
+        android:textSize="25dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.059"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView9"
+        app:layout_constraintVertical_bias="0.134" />
+
+>>>>>>> 70b4b281b231440421aea118b86833c11ff4c825
 </androidx.constraintlayout.widget.ConstraintLayout>

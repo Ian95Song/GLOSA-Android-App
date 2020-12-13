@@ -211,14 +211,13 @@ public class CarActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_car);
 
         m_textViewCountDown = findViewById(R.id.textView5);
         m_btnStartSimulation = findViewById(R.id.button);
         m_gpsInformation = findViewById(R.id.textView8);
         m_MapInfo = findViewById(R.id.textView9);
         m_Spat = findViewById(R.id.textView10);
-
         m_btnStartSimulation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

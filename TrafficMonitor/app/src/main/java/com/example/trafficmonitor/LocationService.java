@@ -35,11 +35,11 @@ public class LocationService extends BroadcastReceiver {
 
                     try{
                         /*only used for Textview for function testing  */
-                        MainActivity.getInstance().updateTextView(location_string);
+                        CarActivity.getInstance().updateTextView(location_string);
                         /*only used for Textview for function testing  */
 
-                        MainActivity.getInstance().updateUtmLocation(utmLocation.Easting,utmLocation.Northing); //for further use
-                        MainActivity.getInstance().updateSpeedInfo(location.getSpeed());
+                        CarActivity.getInstance().updateUtmLocation(utmLocation.Easting,utmLocation.Northing); //for further use
+                        CarActivity.getInstance().updateSpeedInfo(location.getSpeed());
 
                     }catch (Exception ex){
                         Toast.makeText(context, location_string, Toast.LENGTH_SHORT).show();

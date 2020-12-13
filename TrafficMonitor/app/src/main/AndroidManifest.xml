@@ -12,15 +12,21 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TrafficMonitor">
-<<<<<<< HEAD
+
 
         <activity android:name=".SplashScreen">
-=======
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            </activity>
+
         <receiver
             android:name=".LocationService"/>
 
         <activity android:name=".MainActivity">
->>>>>>> 70b4b281b231440421aea118b86833c11ff4c825
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -28,7 +34,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".MainActivity" />
+
         <activity android:name=".BicycleActivity"
             android:parentActivityName="com.example.trafficmonitor.MainActivity"></activity>
 

@@ -2,8 +2,15 @@ package com.example.trafficmonitor;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.os.Build;
+
 import androidx.core.app.ActivityCompat;
+
 import android.Manifest;
 import android.app.PendingIntent;
 import android.content.Intent;
@@ -17,9 +24,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.maps.android.collections.MarkerManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
@@ -28,9 +43,12 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-public class CarActivity extends AppCompatActivity {
+
+public class CarActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     /*Timer Functions*/
     private TextView m_textViewCountDown;
@@ -128,6 +146,11 @@ public class CarActivity extends AppCompatActivity {
         this.currentSpeed = speed;
     }
 
+    public void updateLocationWGS(Location location) {
+        LatLng locationCurrent = new LatLng(location.getLatitude(), location.getLongitude());
+        gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locationCurrent, 19f));
+    }
+
 
     /*only used for Textview for function testing  */
     public void updateTextView(String value) {
@@ -144,14 +167,15 @@ public class CarActivity extends AppCompatActivity {
 
     /*Http Client and JSON Parser of Map Info(Yuanheng)*/
     private static TextView m_MapInfo;
+    private MapInfo mapInfo;
     // Async processing
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void updateMapInfoText() {
-        Runnable runnable = new Runnable(){
+        Runnable runnable = new Runnable() {
             public void run() {
                 try {
                     String mapInfoStr = Utils.getMapInfoJson();
-                    MapInfo mapInfo = Utils.mapInfoParser(mapInfoStr);
+                    mapInfo = Utils.mapInfoParser(mapInfoStr);
                     int intersectionID = mapInfo.map.intersection.intersectionID;
                     //Update view at main thread
                     runOnUiThread(new Runnable() {
@@ -161,7 +185,7 @@ public class CarActivity extends AppCompatActivity {
                         }
                     });
                 } catch (Exception e) {
-                    Log.w("Client","Invalid Authorization or Server down. Please check AuthUrlInfo");
+                    Log.w("Client", "Invalid Authorization or Server down. Please check AuthUrlInfo");
                     e.printStackTrace();
                 }
             }
@@ -169,8 +193,10 @@ public class CarActivity extends AppCompatActivity {
         Thread thread = new Thread(runnable);
         thread.start();
     }
+
     /*Http Client and JSON Parser of Spat(Yuanheng)*/
     // State and left Time of last signal group
+
     private static TextView m_Spat;
     //Update view at main thread
     public void updateSpatText(Phases phasesLastSignalGroup) {
@@ -178,11 +204,16 @@ public class CarActivity extends AppCompatActivity {
             @Override
             public void run() {
                 CurrentState currentState = phasesLastSignalGroup.getCurrentState();
-                m_Spat.setText("Signal Group: "+currentState.signalGroupId+" "
-                        +currentState.state+" Left: "+currentState.timeLefts+" s");
+                currentState.setPostionWGS(mapInfo.map.intersection.lanes);
+                List<CurrentState> trafficLights = new ArrayList<>();
+                trafficLights.add(currentState);
+                getTrafficLights(trafficLights);
+                m_Spat.setText("Signal Group: " + currentState.signalGroupId + " "
+                        + currentState.state + " Left: " + currentState.timeLefts + " s");
             }
         });
     }
+
     // Async processing
     public void requestSpat() {
         Runnable runnable = new Runnable() {
@@ -195,10 +226,10 @@ public class CarActivity extends AppCompatActivity {
                     Long timestamp = spat.timestamp;
                     int signalGroupId = movementStates.get(0).signalGroupId;
                     List<MovementEvent> movementEvents = movementStates.get(0).movementEvents;
-                    Phases phasesLastSignalGroup = new Phases(timestamp,signalGroupId,movementEvents);
+                    Phases phasesLastSignalGroup = new Phases(timestamp, signalGroupId, movementEvents);
                     updateSpatText(phasesLastSignalGroup);
                 } catch (Exception e) {
-                    Log.w("Client","Invalid Authorization or Server down. Please check AuthUrlInfo");
+                    Log.w("Client", "Invalid Authorization or Server down. Please check AuthUrlInfo");
                     e.printStackTrace();
                 }
             }
@@ -207,11 +238,14 @@ public class CarActivity extends AppCompatActivity {
         thread.start();
     }
 
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_car);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
 
         m_textViewCountDown = findViewById(R.id.textView5);
         m_btnStartSimulation = findViewById(R.id.button);
@@ -252,7 +286,47 @@ public class CarActivity extends AppCompatActivity {
                     }
                 }).check();
     }
-
+    private GoogleMap gMap;
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        gMap = googleMap;
+        //LatLng intersection = new LatLng(52.564232999999994, 13.327774999999999);
+        //gMap.addMarker(new MarkerOptions().position(intersection).title("Reference Point of Intersection 14052"));
+        //gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(intersection, 19f));
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        gMap.setMyLocationEnabled(true);
+    }
+    public void getTrafficLights(List<CurrentState> trafficLights){
+        MarkerManager markerManager = new MarkerManager(gMap);
+        MarkerManager.Collection markerCollection = markerManager.newCollection();
+        Log.i("test",String.valueOf(trafficLights.size()));
+        for(int i = 0; i < trafficLights.size(); i++){
+            markerCollection.addMarker(
+                    new MarkerOptions()
+                            .position(
+                                    new LatLng(
+                                            trafficLights.get(i).postionWGS.lat,
+                                            trafficLights.get(i).postionWGS.lng
+                                    )
+                            )
+                            .icon(BitmapDescriptorFactory.fromBitmap(getTrafficLightBitmap("STOP_AND_REMAIN")))
+                            .title("nameTest")
+            );
+        }
+    }
+    @SuppressLint("ResourceType")
+    public Bitmap getTrafficLightBitmap(String state){
+        InputStream is;
+        switch (state){
+            default:
+                is = this.getResources().openRawResource(R.drawable.red);
+                break;
+        }
+        Bitmap bm = BitmapFactory.decodeStream(is);
+        return Bitmap.createScaledBitmap(bm, bm.getWidth()/2, bm.getHeight()/2,true);
+    }
 }
 
 

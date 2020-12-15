@@ -37,7 +37,7 @@ public class LocationService extends BroadcastReceiver {
                         /*only used for Textview for function testing  */
                         CarActivity.getInstance().updateTextView(location_string);
                         /*only used for Textview for function testing  */
-
+                        CarActivity.getInstance().updateLocationWGS(location);
                         CarActivity.getInstance().updateUtmLocation(utmLocation.Easting,utmLocation.Northing); //for further use
                         CarActivity.getInstance().updateSpeedInfo(location.getSpeed());
 

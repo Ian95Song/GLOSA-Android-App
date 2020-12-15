@@ -23,6 +23,10 @@ class Lanes{
 class PositionWGS84{
     double lng;
     double lat;
+    public PositionWGS84 (double lat, double lng){
+        this.lat = lat;
+        this.lng = lng;
+    }
 }
 class positionUTM{
     double east;

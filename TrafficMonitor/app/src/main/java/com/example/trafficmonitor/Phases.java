@@ -13,10 +13,20 @@ class CurrentState {
     String state;
     int timeLefts; // unit is second
     int signalGroupId;
+    PositionWGS84 postionWGS;
     public CurrentState(String state, int timeLefts, int signalGroupId){
         this.state = state;
         this.timeLefts = timeLefts;
         this.signalGroupId = signalGroupId;
+    }
+
+    public void setPostionWGS(List<Lanes> lanes) {
+        for(int i = 0; i < lanes.size(); i++){
+            if(lanes.get(i).signalGroup == this.signalGroupId){
+                this.postionWGS = lanes.get(i).positionWGS84;
+                break;
+            }
+        }
     }
 }
 

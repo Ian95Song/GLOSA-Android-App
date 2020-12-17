@@ -162,12 +162,25 @@ public class CarActivity extends AppCompatActivity implements OnMapReadyCallback
         });
     }
     /*only used for Textview for function testing  */
+    /*Distance and necessary speed calculation(Yuanheng)*/
+    // Route from "Scharnweberstraße 132, 13405 Berlin" to "Scharnweberstraße 140, 13405 Berlin"
+    // with Speed 1X almost 4 m/s used to test
+    int timeLeft = 25; // second
+    public void updateDistanceToIntersection(UTMLocation curretnLocation, float speed){
+        if(intersectionLocation != null){
+            double distance = Utils.getUTMDistance(curretnLocation, intersectionLocation);
+            Log.i("Distance",distance+" m");
+            double speed_nec = distance / timeLeft; // m/s
+            Log.i("Necessary Speed",speed_nec+" m/s -> "+speed_nec*3.6+"km/h");
+        }
+    }
 
     /*GPS Information*/
 
     /*Http Client and JSON Parser of Map Info(Yuanheng)*/
     private static TextView m_MapInfo;
     private MapInfo mapInfo;
+    UTMLocation intersectionLocation;
     // Async processing
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void updateMapInfoText() {
@@ -177,6 +190,7 @@ public class CarActivity extends AppCompatActivity implements OnMapReadyCallback
                     String mapInfoStr = Utils.getMapInfoJson();
                     mapInfo = Utils.mapInfoParser(mapInfoStr);
                     int intersectionID = mapInfo.map.intersection.intersectionID;
+                    intersectionLocation = new UTMLocation(mapInfo.map.intersection.positionUTM.east,mapInfo.map.intersection.positionUTM.north);
                     //Update view at main thread
                     runOnUiThread(new Runnable() {
                         @Override

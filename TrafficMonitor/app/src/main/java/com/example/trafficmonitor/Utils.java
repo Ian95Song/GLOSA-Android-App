@@ -78,4 +78,9 @@ public class Utils {
         MapInfo mapInfo = gson.fromJson(jsonString, mapInfoType);
         return mapInfo;
     }
+    public static double getUTMDistance(UTMLocation location1, UTMLocation location2){ // Meter
+        double distance = Math.sqrt(
+                Math.pow(location2.east-location1.east,2) + Math.pow(location2.north-location1.north,2));
+        return distance;
+    }
 }

@@ -1,11 +1,9 @@
 package com.example.trafficmonitor;
 
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
-import android.os.IBinder;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationResult;

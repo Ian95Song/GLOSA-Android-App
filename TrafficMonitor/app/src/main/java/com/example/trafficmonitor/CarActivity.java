@@ -169,9 +169,9 @@ public class CarActivity extends AppCompatActivity implements OnMapReadyCallback
     public void updateDistanceToIntersection(UTMLocation curretnLocation, float speed){
         if(intersectionLocation != null){
             double distance = Utils.getUTMDistance(curretnLocation, intersectionLocation);
-            Log.i("Distance",distance+" m");
+            //Log.i("Distance",distance+" m");
             double speed_nec = distance / timeLeft; // m/s
-            Log.i("Necessary Speed",speed_nec+" m/s -> "+speed_nec*3.6+"km/h");
+            //Log.i("Necessary Speed",speed_nec+" m/s -> "+speed_nec*3.6+"km/h");
         }
     }
 
@@ -187,7 +187,7 @@ public class CarActivity extends AppCompatActivity implements OnMapReadyCallback
         Runnable runnable = new Runnable() {
             public void run() {
                 try {
-                    String mapInfoStr = Utils.getMapInfoJson();
+                    String mapInfoStr = Utils.getMapInfoJson(getResources().getString(R.string.map_info_url));
                     mapInfo = Utils.mapInfoParser(mapInfoStr);
                     int intersectionID = mapInfo.map.intersection.intersectionID;
                     intersectionLocation = new UTMLocation(mapInfo.map.intersection.positionUTM.east,mapInfo.map.intersection.positionUTM.north);
@@ -234,7 +234,7 @@ public class CarActivity extends AppCompatActivity implements OnMapReadyCallback
             @RequiresApi(api = Build.VERSION_CODES.O)
             public void run() {
                 try {
-                    String spatStr = Utils.getSpatJson(); // need almost 12s
+                    String spatStr = Utils.getSpatJson(getResources().getString(R.string.spat_url)); // need almost 12s
                     Spat spat = Utils.spatParser(spatStr);
                     List<MovementState> movementStates = spat.intersectionStates.get(0).movementStates;
                     Long timestamp = spat.timestamp;
@@ -315,7 +315,7 @@ public class CarActivity extends AppCompatActivity implements OnMapReadyCallback
     public void getTrafficLights(List<CurrentState> trafficLights){
         MarkerManager markerManager = new MarkerManager(gMap);
         MarkerManager.Collection markerCollection = markerManager.newCollection();
-        Log.i("test",String.valueOf(trafficLights.size()));
+        //Log.i("test",String.valueOf(trafficLights.size()));
         for(int i = 0; i < trafficLights.size(); i++){
             markerCollection.addMarker(
                     new MarkerOptions()
@@ -335,7 +335,7 @@ public class CarActivity extends AppCompatActivity implements OnMapReadyCallback
         InputStream is;
         switch (state){
             default:
-                is = this.getResources().openRawResource(R.drawable.red);
+                is = getResources().openRawResource(R.drawable.red);
                 break;
         }
         Bitmap bm = BitmapFactory.decodeStream(is);

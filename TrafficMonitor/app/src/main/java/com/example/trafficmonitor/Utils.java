@@ -1,5 +1,6 @@
 package com.example.trafficmonitor;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
@@ -18,10 +19,18 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 public class Utils {
+    private static String _s_username = "username";
+    private static String _s_password = "password";
+    protected static void setBasicAuth(String usernameToSet, String passwordToSet){
+        _s_username = usernameToSet;
+        _s_password = passwordToSet;
+    }
+    private static String getBasicAuth(){
+        return _s_username + ":" + _s_password;
+    }
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static String getMapInfoJson() throws IOException {
-        String mapInfoUrl = AuthUrlInfo.getMapInfoUrl();
-        String basicAuth = AuthUrlInfo.getBasicAuth();
+    protected static String getMapInfoJson(String mapInfoUrl) throws IOException {
+        String basicAuth = getBasicAuth();
         String encodedAuth = "Basic " + Base64.getEncoder().encodeToString(basicAuth.getBytes(StandardCharsets.UTF_8));
         URL url = new URL(mapInfoUrl);
         URLConnection con = url.openConnection();
@@ -37,11 +46,10 @@ public class Utils {
             return sb.toString();
     }
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static String getSpatJson() throws IOException {
-        String mapInfoUrl = AuthUrlInfo.getSpatUrl();
-        String basicAuth = AuthUrlInfo.getBasicAuth();
+    protected static String getSpatJson(String spatUrl) throws IOException {
+        String basicAuth = getBasicAuth();
         String encodedAuth = "Basic " + Base64.getEncoder().encodeToString(basicAuth.getBytes(StandardCharsets.UTF_8));
-        URL url = new URL(mapInfoUrl);
+        URL url = new URL(spatUrl);
         URLConnection con = url.openConnection();
         con.setRequestProperty("Authorization", encodedAuth);
         InputStream is = con.getInputStream();
@@ -66,19 +74,19 @@ public class Utils {
         is.close();
         return sb.toString();
     }
-    public static Spat spatParser(String jsonString){
+    protected static Spat spatParser(String jsonString){
         Gson gson = new Gson();
         Type spatType = new TypeToken<Spat>(){}.getType();
         Spat spat = gson.fromJson(jsonString, spatType);
         return spat;
     }
-    public static MapInfo mapInfoParser(String jsonString){
+    protected static MapInfo mapInfoParser(String jsonString){
         Gson gson = new Gson();
         Type mapInfoType = new TypeToken<MapInfo>(){}.getType();
         MapInfo mapInfo = gson.fromJson(jsonString, mapInfoType);
         return mapInfo;
     }
-    public static double getUTMDistance(UTMLocation location1, UTMLocation location2){ // Meter
+    protected static double getUTMDistance(UTMLocation location1, UTMLocation location2){ // Meter
         double distance = Math.sqrt(
                 Math.pow(location2.east-location1.east,2) + Math.pow(location2.north-location1.north,2));
         return distance;

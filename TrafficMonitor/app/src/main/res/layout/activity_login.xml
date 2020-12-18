@@ -6,43 +6,42 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".LoginActivity">
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
     <EditText
-        android:id="@+id/mUserName"
+        android:id="@+id/loginUserName"
         android:hint="Username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"/>
-
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"/>
     <EditText
-        android:id="@+id/mPassWord"
+        android:id="@+id/loginPassWord"
         android:hint="Password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/mUserName"
+        app:layout_constraintTop_toBottomOf="@+id/loginUserName"
         />
-
-    <RelativeLayout
+    <CheckBox
+        android:id="@+id/loginRemeberCheckBox"
+        android:text="Remember me"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/mPassWord"
+        app:layout_constraintTop_toBottomOf="@+id/loginPassWord"
+        app:layout_constraintStart_toStartOf="parent"/>
+    <CheckBox
+        android:id="@+id/loginShowCheckBox"
+        android:text="Show Password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/loginPassWord"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <Button
+        android:id="@+id/loginButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/loginShowCheckBox"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        >
-
-        <CheckBox
-            android:layout_centerVertical="true"
-            android:id="@+id/mCheckBox"
-            android:text="Remember me"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <Button
-            android:id="@+id/mButton"
-            android:text="Login"
-            android:layout_alignParentRight="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
-
-    </RelativeLayout>
-
+        android:text="Login" />
 </androidx.constraintlayout.widget.ConstraintLayout>

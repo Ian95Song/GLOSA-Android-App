@@ -1,17 +1,20 @@
 package com.example.trafficmonitor;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -25,10 +28,10 @@ import java.io.InputStreamReader;
 
 
 public class LoginActivity extends AppCompatActivity {
-    private EditText mUsername;
-    private EditText mPassWord;
-    String username=null;
-    String password=null;
+    private EditText _m_eText_username;
+    private EditText _m_eText_password;
+    String m_username = null;
+    String m_password = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,43 +39,73 @@ public class LoginActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Login");
 
-        Button mButton=(Button)findViewById(R.id.mButton);
-        mUsername=(EditText)findViewById(R.id.mUserName);
-        mPassWord=(EditText)findViewById(R.id.mPassWord);
-        final CheckBox mCheckbox=(CheckBox)findViewById(R.id.mCheckBox);
-        readfrominfo();
-        mButton.setOnClickListener(new View.OnClickListener() {
+        Button button=(Button)findViewById(R.id.loginButton);
+        _m_eText_username=(EditText)findViewById(R.id.loginUserName);
+        _m_eText_password=(EditText)findViewById(R.id.loginPassWord);
+        _m_eText_password.setTransformationMethod(PasswordTransformationMethod.getInstance());
+        CheckBox rememberCheckbox=(CheckBox)findViewById(R.id.loginRemeberCheckBox);
+        CheckBox showCheckbox=(CheckBox)findViewById(R.id.loginShowCheckBox);
+        readAuthFromLocal();
+
+        showCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
-                if (mCheckbox.isChecked()){
-                    username=mUsername.getText().toString();
-                    password=mPassWord.getText().toString();
-                    File file = new File(getFilesDir(),"info.txt");
-                    Log.i("Auth",file.getAbsolutePath());
-                    FileOutputStream fos= null;
-                    try {
-                        fos = new FileOutputStream(file);
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        fos.write((username+"##"+password).getBytes());
-                        fos.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    _m_eText_password.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                }else{
+                    _m_eText_password.setTransformationMethod(PasswordTransformationMethod.getInstance());
                 }
 
-                Toast.makeText(LoginActivity.this,"login successfully", Toast.LENGTH_SHORT).show();
-                Intent homeIntent = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(homeIntent);
-                finish();
+            }
+        });
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onClick(View v) {
+                m_username=_m_eText_username.getText().toString();
+                m_password=_m_eText_password.getText().toString();
+                if (rememberCheckbox.isChecked()){
+                    writeAuthToLocal(m_username, m_password);
+                }
+                // update Auth
+                Utils.setBasicAuth(m_username, m_password);
+                // check Auth
+                Runnable runnable = new Runnable() {
+                    public void run() {
+                        try {
+                            String mapInfoStr = Utils.getMapInfoJson(getResources().getString(R.string.map_info_url));
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(LoginActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
+                                    Intent homeIntent = new Intent(LoginActivity.this, MainActivity.class);
+                                    startActivity(homeIntent);
+                                    finish();
+                                }
+                            });
+                        } catch (Exception e) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(LoginActivity.this, "Invalid Authorization or Server down", Toast.LENGTH_SHORT).show();
+
+                                }
+                            });
+                        }
+                    }
+                };
+                Thread thread = new Thread(runnable);
+                thread.start();
             }
         });
     }
-    public void readfrominfo(){
-        File file = new File(getFilesDir(),"info.txt");
+
+    public void readAuthFromLocal(){
+        // read file
+        File file = new File(getFilesDir(),"Authorization.txt");
         if(file.exists()){
             BufferedReader br= null;
             try {
@@ -87,9 +120,27 @@ public class LoginActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
             String [] up= str.split("##");
-
-            mUsername.setText(up[0]);
-            mPassWord.setText(up[1]);
+            _m_eText_username.setText(up[0]);
+            _m_eText_password.setText(up[1]);
+            // update Auth
+            Utils.setBasicAuth(up[0], up[1]);
+        }
+    }
+    public void writeAuthToLocal(String username, String password){
+        // write file
+        File file = new File(getFilesDir(),"Authorization.txt");
+        Log.i("Auth",file.getAbsolutePath());
+        FileOutputStream fos= null;
+        try {
+            fos = new FileOutputStream(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        try {
+            fos.write((username+"##"+password).getBytes());
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

@@ -5,82 +5,74 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".BicycleActivity">
-
     <include
         android:id="@+id/toolbar"
         layout="@layout/toolbar" />
-
     <ImageView
-        android:id="@+id/imageView6"
+        android:id="@+id/bicycleImageViewTrafficLight1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="140dp"
         android:layout_marginBottom="441dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/imageView7"
+        app:layout_constraintEnd_toStartOf="@+id/bicycleImageViewTrafficLight2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/red" />
-
     <ImageView
-        android:id="@+id/imageView7"
+        android:id="@+id/bicycleImageViewTrafficLight2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="140dp"
         android:layout_marginBottom="441dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/imageView8"
-        app:layout_constraintStart_toEndOf="@+id/imageView6"
+        app:layout_constraintEnd_toStartOf="@+id/bicycleImageViewTrafficLight3"
+        app:layout_constraintStart_toEndOf="@+id/bicycleImageViewTrafficLight1"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/red" />
-
     <ImageView
-        android:id="@+id/imageView8"
+        android:id="@+id/bicycleImageViewTrafficLight3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="140dp"
         android:layout_marginBottom="441dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/imageView7"
+        app:layout_constraintStart_toEndOf="@+id/bicycleImageViewTrafficLight2"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/red" />
-
     <ImageView
-        android:id="@+id/imageView12"
+        android:id="@+id/bicycleImageViewStraight"
         android:layout_width="118dp"
         android:layout_height="100dp"
         android:layout_marginTop="25dp"
         android:layout_marginBottom="316dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/imageView13"
-        app:layout_constraintStart_toEndOf="@+id/imageView14"
-        app:layout_constraintTop_toBottomOf="@+id/imageView7"
+        app:layout_constraintEnd_toStartOf="@+id/bicycleImageViewRight"
+        app:layout_constraintStart_toEndOf="@+id/bicycleImageViewLeft"
+        app:layout_constraintTop_toBottomOf="@+id/bicycleImageViewTrafficLight2"
         app:srcCompat="@drawable/straight" />
-
     <ImageView
-        android:id="@+id/imageView13"
+        android:id="@+id/bicycleImageViewRight"
         android:layout_width="118dp"
         android:layout_height="100dp"
         android:layout_marginTop="25dp"
         android:layout_marginBottom="316dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/imageView12"
-        app:layout_constraintTop_toBottomOf="@+id/imageView8"
+        app:layout_constraintStart_toEndOf="@+id/bicycleImageViewStraight"
+        app:layout_constraintTop_toBottomOf="@+id/bicycleImageViewTrafficLight3"
         app:srcCompat="@drawable/right1" />
-
     <ImageView
-        android:id="@+id/imageView14"
+        android:id="@+id/bicycleImageViewLeft"
         android:layout_width="118dp"
         android:layout_height="100dp"
         android:layout_marginTop="25dp"
         android:layout_marginBottom="316dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/imageView12"
+        app:layout_constraintEnd_toStartOf="@+id/bicycleImageViewStraight"
         app:layout_constraintHorizontal_bias="0.241"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView6"
+        app:layout_constraintTop_toBottomOf="@+id/bicycleImageViewTrafficLight1"
         app:srcCompat="@drawable/left1" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

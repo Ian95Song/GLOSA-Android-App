@@ -10,37 +10,38 @@
         android:id="@+id/toolbar"
         layout="@layout/toolbar" />
     <EditText
-        android:id="@+id/loginUserName"
+        android:id="@+id/loginEditTextUserName"
         android:hint="Username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"/>
     <EditText
-        android:id="@+id/loginPassWord"
+        android:id="@+id/loginEditTextPassWord"
         android:hint="Password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/loginUserName"
+        app:layout_constraintTop_toBottomOf="@+id/loginEditTextUserName"
         />
     <CheckBox
-        android:id="@+id/loginRemeberCheckBox"
+        android:id="@+id/loginCheckBoxRemember"
         android:text="Remember me"
+        android:checked="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/loginPassWord"
+        app:layout_constraintTop_toBottomOf="@+id/loginEditTextPassWord"
         app:layout_constraintStart_toStartOf="parent"/>
     <CheckBox
-        android:id="@+id/loginShowCheckBox"
+        android:id="@+id/loginCheckBoxShow"
         android:text="Show Password"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/loginPassWord"
+        app:layout_constraintTop_toBottomOf="@+id/loginEditTextPassWord"
         app:layout_constraintEnd_toEndOf="parent"/>
     <Button
         android:id="@+id/loginButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/loginShowCheckBox"
+        app:layout_constraintTop_toBottomOf="@+id/loginCheckBoxShow"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:text="Login" />

@@ -10,13 +10,13 @@ class Map{
 }
 class Intersection{
     PositionWGS84 positionWGS84;
-    positionUTM positionUTM;
+    PositionUTM positionUTM;
     int intersectionID;
     List<Lanes> lanes;
 }
 class Lanes{
     PositionWGS84 positionWGS84;
-    positionUTM positionUTM;
+    PositionUTM positionUTM;
     int id;
     int signalGroup;
 }
@@ -28,7 +28,7 @@ class PositionWGS84{
         this.lng = lng;
     }
 }
-class positionUTM{
+class PositionUTM{
     double east;
     double north;
 }

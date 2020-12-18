@@ -42,11 +42,11 @@ public class LoginActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Login");
 
         Button button=(Button)findViewById(R.id.loginButton);
-        _m_eText_username=(EditText)findViewById(R.id.loginUserName);
-        _m_eText_password=(EditText)findViewById(R.id.loginPassWord);
+        _m_eText_username=(EditText)findViewById(R.id.loginEditTextUserName);
+        _m_eText_password=(EditText)findViewById(R.id.loginEditTextPassWord);
         _m_eText_password.setTransformationMethod(PasswordTransformationMethod.getInstance());
-        CheckBox rememberCheckbox=(CheckBox)findViewById(R.id.loginRemeberCheckBox);
-        CheckBox showCheckbox=(CheckBox)findViewById(R.id.loginShowCheckBox);
+        CheckBox rememberCheckbox=(CheckBox)findViewById(R.id.loginCheckBoxRemember);
+        CheckBox showCheckbox=(CheckBox)findViewById(R.id.loginCheckBoxShow);
         readAuthFromLocal();
 
         showCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -103,6 +103,12 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    /*
+     * Input: none
+     * Return: none
+     * Description: try to read authorization information from local,
+     *              and if get it, update Edit Text and variables in background
+     */
     public void readAuthFromLocal(){
         // read file
         File file = new File(getFilesDir(),"Authorization.txt");
@@ -126,6 +132,12 @@ public class LoginActivity extends AppCompatActivity {
             Utils.setBasicAuth(up[0], up[1]);
         }
     }
+
+    /*
+     * Input: String of username and password
+     * Return: none
+     * Description: write authorization information to local
+     */
     public void writeAuthToLocal(String username, String password){
         // write file
         File file = new File(getFilesDir(),"Authorization.txt");

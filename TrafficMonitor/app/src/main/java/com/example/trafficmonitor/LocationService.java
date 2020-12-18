@@ -9,9 +9,7 @@ import android.widget.Toast;
 import com.google.android.gms.location.LocationResult;
 
 public class LocationService extends BroadcastReceiver {
-
     public static final String ACTION_PROCESS_UPDATE = "com.example.trafficmonitor.UPDATE_LOCATION";
-
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent != null) {
@@ -22,93 +20,87 @@ public class LocationService extends BroadcastReceiver {
                     Location location = result.getLastLocation();
                     UTMLocation utmLocation = new UTMLocation();
                     utmLocation.getUTMLocationFromWGS(location.getLatitude(), location.getLongitude());
-                    /*only used for Textview for function testing  */
-                    String location_string = new StringBuilder("" + utmLocation.east)
+                    String locationString = new StringBuilder("" + utmLocation.m_east)
                             .append("/")
-                            .append(utmLocation.north)
+                            .append(utmLocation.m_north)
                             .append("/")
                             .append(location.getSpeed())
                             .toString();
-                    /*only used for Textview for function testing  */
-
                     try {
-                        /*only used for Textview for function testing  */
-                        CarActivity.getInstance().updateTextView(location_string);
-                        /*only used for Textview for function testing  */
-                        CarActivity.getInstance().updateLocationWGS(location);
-                        CarActivity.getInstance().updateUtmLocation(utmLocation.east, utmLocation.north); //for further use
-                        CarActivity.getInstance().updateSpeedInfo(location.getSpeed());
-                        CarActivity.getInstance().updateDistanceToIntersection(utmLocation, location.getSpeed());
+                        CarActivity.getInstance().updateGPSTextView(locationString);
+                        CarActivity.getInstance().updateUtmLocation(utmLocation);
+                        CarActivity.getInstance().updateSpeed(location.getSpeed());
+                        CarActivity.getInstance().updateDistanceToIntersection(utmLocation);
+                        WalkingActivity.getInstance().updateLocationWGS(location);
                     } catch (Exception ex) {
-                        Toast.makeText(context, location_string, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, locationString, Toast.LENGTH_SHORT).show();
                     }
                 }
             }
         }
     }
 }
-// WSG84 to UTM convertion
 class UTMLocation {
-    double east;
-    double north;
-    int Zone;
-    char Letter;
+    double m_east;
+    double m_north;
+    int m_zone;
+    char m_letter;
     public UTMLocation(){
-        this.east = 0.0;
-        this.north = 0.0;
+        this.m_east = 0.0;
+        this.m_north = 0.0;
     }
     public UTMLocation(double east, double north){
-        this.east = east;
-        this.north = north;
+        this.m_east = east;
+        this.m_north = north;
     }
     public void getUTMLocationFromWGS (double Lat,double Lon) {
-        Zone= (int) Math.floor(Lon/6+31);
+        m_zone= (int) Math.floor(Lon/6+31);
         if (Lat<-72)
-            Letter='C';
+            m_letter='C';
         else if (Lat<-64)
-            Letter='D';
+            m_letter='D';
         else if (Lat<-56)
-            Letter='E';
+            m_letter='E';
         else if (Lat<-48)
-            Letter='F';
+            m_letter='F';
         else if (Lat<-40)
-            Letter='G';
+            m_letter='G';
         else if (Lat<-32)
-            Letter='H';
+            m_letter='H';
         else if (Lat<-24)
-            Letter='J';
+            m_letter='J';
         else if (Lat<-16)
-            Letter='K';
+            m_letter='K';
         else if (Lat<-8)
-            Letter='L';
+            m_letter='L';
         else if (Lat<0)
-            Letter='M';
+            m_letter='M';
         else if (Lat<8)
-            Letter='N';
+            m_letter='N';
         else if (Lat<16)
-            Letter='P';
+            m_letter='P';
         else if (Lat<24)
-            Letter='Q';
+            m_letter='Q';
         else if (Lat<32)
-            Letter='R';
+            m_letter='R';
         else if (Lat<40)
-            Letter='S';
+            m_letter='S';
         else if (Lat<48)
-            Letter='T';
+            m_letter='T';
         else if (Lat<56)
-            Letter='U';
+            m_letter='U';
         else if (Lat<64)
-            Letter='V';
+            m_letter='V';
         else if (Lat<72)
-            Letter='W';
+            m_letter='W';
         else
-            Letter='X';
-        east=0.5*Math.log((1+Math.cos(Lat*Math.PI/180)*Math.sin(Lon*Math.PI/180-(6*Zone-183)*Math.PI/180))/(1-Math.cos(Lat*Math.PI/180)*Math.sin(Lon*Math.PI/180-(6*Zone-183)*Math.PI/180)))*0.9996*6399593.62/Math.pow((1+Math.pow(0.0820944379, 2)*Math.pow(Math.cos(Lat*Math.PI/180), 2)), 0.5)*(1+ Math.pow(0.0820944379,2)/2*Math.pow((0.5*Math.log((1+Math.cos(Lat*Math.PI/180)*Math.sin(Lon*Math.PI/180-(6*Zone-183)*Math.PI/180))/(1-Math.cos(Lat*Math.PI/180)*Math.sin(Lon*Math.PI/180-(6*Zone-183)*Math.PI/180)))),2)*Math.pow(Math.cos(Lat*Math.PI/180),2)/3)+500000;
-        east=Math.round(east*100)*0.01;
-        north = (Math.atan(Math.tan(Lat*Math.PI/180)/Math.cos((Lon*Math.PI/180-(6*Zone -183)*Math.PI/180)))-Lat*Math.PI/180)*0.9996*6399593.625/Math.sqrt(1+0.006739496742*Math.pow(Math.cos(Lat*Math.PI/180),2))*(1+0.006739496742/2*Math.pow(0.5*Math.log((1+Math.cos(Lat*Math.PI/180)*Math.sin((Lon*Math.PI/180-(6*Zone -183)*Math.PI/180)))/(1-Math.cos(Lat*Math.PI/180)*Math.sin((Lon*Math.PI/180-(6*Zone -183)*Math.PI/180)))),2)*Math.pow(Math.cos(Lat*Math.PI/180),2))+0.9996*6399593.625*(Lat*Math.PI/180-0.005054622556*(Lat*Math.PI/180+Math.sin(2*Lat*Math.PI/180)/2)+4.258201531e-05*(3*(Lat*Math.PI/180+Math.sin(2*Lat*Math.PI/180)/2)+Math.sin(2*Lat*Math.PI/180)*Math.pow(Math.cos(Lat*Math.PI/180),2))/4-1.674057895e-07*(5*(3*(Lat*Math.PI/180+Math.sin(2*Lat*Math.PI/180)/2)+Math.sin(2*Lat*Math.PI/180)*Math.pow(Math.cos(Lat*Math.PI/180),2))/4+Math.sin(2*Lat*Math.PI/180)*Math.pow(Math.cos(Lat*Math.PI/180),2)*Math.pow(Math.cos(Lat*Math.PI/180),2))/3);
-        if (Letter<'M')
-            north = north + 10000000;
-        north=Math.round(north*100)*0.01;
+            m_letter='X';
+        m_east=0.5*Math.log((1+Math.cos(Lat*Math.PI/180)*Math.sin(Lon*Math.PI/180-(6*m_zone-183)*Math.PI/180))/(1-Math.cos(Lat*Math.PI/180)*Math.sin(Lon*Math.PI/180-(6*m_zone-183)*Math.PI/180)))*0.9996*6399593.62/Math.pow((1+Math.pow(0.0820944379, 2)*Math.pow(Math.cos(Lat*Math.PI/180), 2)), 0.5)*(1+ Math.pow(0.0820944379,2)/2*Math.pow((0.5*Math.log((1+Math.cos(Lat*Math.PI/180)*Math.sin(Lon*Math.PI/180-(6*m_zone-183)*Math.PI/180))/(1-Math.cos(Lat*Math.PI/180)*Math.sin(Lon*Math.PI/180-(6*m_zone-183)*Math.PI/180)))),2)*Math.pow(Math.cos(Lat*Math.PI/180),2)/3)+500000;
+        m_east=Math.round(m_east*100)*0.01;
+        m_north = (Math.atan(Math.tan(Lat*Math.PI/180)/Math.cos((Lon*Math.PI/180-(6*m_zone -183)*Math.PI/180)))-Lat*Math.PI/180)*0.9996*6399593.625/Math.sqrt(1+0.006739496742*Math.pow(Math.cos(Lat*Math.PI/180),2))*(1+0.006739496742/2*Math.pow(0.5*Math.log((1+Math.cos(Lat*Math.PI/180)*Math.sin((Lon*Math.PI/180-(6*m_zone -183)*Math.PI/180)))/(1-Math.cos(Lat*Math.PI/180)*Math.sin((Lon*Math.PI/180-(6*m_zone -183)*Math.PI/180)))),2)*Math.pow(Math.cos(Lat*Math.PI/180),2))+0.9996*6399593.625*(Lat*Math.PI/180-0.005054622556*(Lat*Math.PI/180+Math.sin(2*Lat*Math.PI/180)/2)+4.258201531e-05*(3*(Lat*Math.PI/180+Math.sin(2*Lat*Math.PI/180)/2)+Math.sin(2*Lat*Math.PI/180)*Math.pow(Math.cos(Lat*Math.PI/180),2))/4-1.674057895e-07*(5*(3*(Lat*Math.PI/180+Math.sin(2*Lat*Math.PI/180)/2)+Math.sin(2*Lat*Math.PI/180)*Math.pow(Math.cos(Lat*Math.PI/180),2))/4+Math.sin(2*Lat*Math.PI/180)*Math.pow(Math.cos(Lat*Math.PI/180),2)*Math.pow(Math.cos(Lat*Math.PI/180),2))/3);
+        if (m_letter<'M')
+            m_north = m_north + 10000000;
+        m_north=Math.round(m_north*100)*0.01;
     }
 
 }

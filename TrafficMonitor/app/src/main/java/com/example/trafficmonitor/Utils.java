@@ -21,13 +21,31 @@ import java.util.Base64;
 public class Utils {
     private static String _s_username = "username";
     private static String _s_password = "password";
+
+    /*
+     * Input: none
+     * Return: String of basic authorization information
+     * Description:
+     */
+    private static String getBasicAuth(){
+        return _s_username + ":" + _s_password;
+    }
+
+    /*
+     * Input: String of username and password
+     * Return: none
+     * Description: set basic authorization information
+     */
     protected static void setBasicAuth(String usernameToSet, String passwordToSet){
         _s_username = usernameToSet;
         _s_password = passwordToSet;
     }
-    private static String getBasicAuth(){
-        return _s_username + ":" + _s_password;
-    }
+
+    /*
+     * Input: String of url address to get json of map information
+     * Return: json String of map information
+     * Description: asynchronous function
+     */
     @RequiresApi(api = Build.VERSION_CODES.O)
     protected static String getMapInfoJson(String mapInfoUrl) throws IOException {
         String basicAuth = getBasicAuth();
@@ -45,6 +63,12 @@ public class Utils {
             is.close();
             return sb.toString();
     }
+
+    /*
+     * Input: String of url address to get json of spat information
+     * Return: json String of spat information
+     * Description: asynchronous function
+     */
     @RequiresApi(api = Build.VERSION_CODES.O)
     protected static String getSpatJson(String spatUrl) throws IOException {
         String basicAuth = getBasicAuth();
@@ -74,21 +98,39 @@ public class Utils {
         is.close();
         return sb.toString();
     }
+
+    /*
+     * Input: json String of spat information
+     * Return: Spat object
+     * Description:
+     */
     protected static Spat spatParser(String jsonString){
         Gson gson = new Gson();
         Type spatType = new TypeToken<Spat>(){}.getType();
         Spat spat = gson.fromJson(jsonString, spatType);
         return spat;
     }
+
+    /*
+     * Input: json String of map information
+     * Return: MapInfo object
+     * Description:
+     */
     protected static MapInfo mapInfoParser(String jsonString){
         Gson gson = new Gson();
         Type mapInfoType = new TypeToken<MapInfo>(){}.getType();
         MapInfo mapInfo = gson.fromJson(jsonString, mapInfoType);
         return mapInfo;
     }
-    protected static double getUTMDistance(UTMLocation location1, UTMLocation location2){ // Meter
+
+    /*
+     * Input: UTMLocation objects of two points
+     * Return: double number of distance between two input points
+     * Description: measurement unit with meter
+     */
+    protected static double getUTMDistance(UTMLocation location1, UTMLocation location2){
         double distance = Math.sqrt(
-                Math.pow(location2.east-location1.east,2) + Math.pow(location2.north-location1.north,2));
+                Math.pow(location2.m_east-location1.m_east,2) + Math.pow(location2.m_north-location1.m_north,2));
         return distance;
     }
 }

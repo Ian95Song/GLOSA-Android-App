@@ -44,7 +44,6 @@ public class Phases {
         this.stateSequence = new ArrayList<>();
         this.relativeLikelyTime = new ArrayList<>();
         this.firstStateLikelyTime = movementEvents.get(0).timeChange.likelyTime / 10;
-
         this.stateSequence.add(movementEvents.get(0).phaseState);
         this.relativeLikelyTime.add(0);
         for(int i = 1; i < 4; i++) {

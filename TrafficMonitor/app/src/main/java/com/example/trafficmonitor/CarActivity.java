@@ -1,20 +1,11 @@
 package com.example.trafficmonitor;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.annotation.SuppressLint;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.location.Location;
 import android.os.Build;
 
-import androidx.core.app.ActivityCompat;
-
-import android.Manifest;
-import android.app.PendingIntent;
-import android.content.Intent;
-import android.content.pm.PackageManager;
+import androidx.appcompat.widget.Toolbar;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
@@ -22,180 +13,193 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.maps.android.collections.MarkerManager;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionDeniedResponse;
-import com.karumi.dexter.listener.PermissionGrantedResponse;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.single.PermissionListener;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class CarActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class CarActivity extends AppCompatActivity {
 
-    /*Timer Functions*/
-    private TextView m_textViewCountDown;
-    private Button m_btnStartSimulation;
-    private CountDownTimer m_countDownTimer;
-    private long m_timeLeftInMillis = 6000;
+    // Traffic light timer parameters
+    private TextView _m_textViewCountDown;
+    private Button _m_btnStartSimulation;
+    private CountDownTimer _m_countDownTimer;
+    private long _m_timeLeftInMillis = 6000;
+    private ImageView _m_imageView_trafficLight;
+    private int _m_current_image_trafficLight;
+    private int[] _m_images_trafficLight = {R.drawable.red, R.drawable.red_yellow, R.drawable.yellow, R.drawable.green};
 
+    // GPS info parameters
+    private static CarActivity _m_instance;
+    private TextView _m_textView_gpsInfo;
+    private UTMLocation _m_current_utm_location;
+    private float _m_current_speed; //in m/s
+
+    // map, spat info parameters
+    private int _m_timeLeft_cal_neceSpeed = 25; // second
+    private TextView _m_textView_mapInfo;
+    private MapInfo _m_mapInfo;
+    private UTMLocation _m_intersection_location;
+    private TextView _m_textView_spat;
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_car);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Car Activity");
+        ActionBar ab = getSupportActionBar();
+        ab.setDisplayHomeAsUpEnabled(true);
+
+        _m_textViewCountDown = findViewById(R.id.carTextViewTimer1);
+        _m_btnStartSimulation = findViewById(R.id.carButtonTest);
+        _m_textView_gpsInfo = findViewById(R.id.carTextViewGPS);
+        _m_textView_mapInfo = findViewById(R.id.carTextViewMapInfo);
+        _m_textView_spat = findViewById(R.id.carTextViewTrafficLightState);
+        _m_btnStartSimulation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                timer();
+            }
+        });
+
+        //Traffic light timer
+        updateCountDownText();
+
+        // GPS info
+        _m_instance = this;
+
+        // map, spat info
+        updateMapInfoText();
+        updateSpatText();
+    }
+
+    // Traffic light timer functions
+    /*
+     * Input: none
+     * Return: none
+     * Description: start timer and update TextView, ImageView of traffic lights
+     */
     private void timer() {
-        m_countDownTimer = new CountDownTimer(m_timeLeftInMillis, 1000) {
+        _m_countDownTimer = new CountDownTimer(_m_timeLeftInMillis, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                m_timeLeftInMillis = millisUntilFinished;
+                _m_timeLeftInMillis = millisUntilFinished;
                 updateCountDownText();
             }
-
             @Override
             public void onFinish() {
-                m_timeLeftInMillis = 6000;
+                _m_timeLeftInMillis = 6000;
                 updateCountDownText();
                 updateTrafficLight();
             }
         }.start();
     }
 
+    /*
+     * Input: none
+     * Return: none
+     * Description: update TextView of traffic lights
+     */
     private void updateCountDownText() {
-        int seconds = (int) (m_timeLeftInMillis / 1000) % 60;
+        int seconds = (int) (_m_timeLeftInMillis / 1000) % 60;
         String timeLeftFormatted = String.format(Locale.getDefault(), "%02d", seconds);
-        m_textViewCountDown.setText(timeLeftFormatted);
+        _m_textViewCountDown.setText(timeLeftFormatted);
     }
-    /*Timer Functions*/
 
-    /*Traffic Light Functions*/
-    private static ImageView m_imageView;
-    private int current_image;
-    int[] images = {R.drawable.red, R.drawable.red_yellow, R.drawable.yellow, R.drawable.green};
-
+    /*
+     * Input: none
+     * Return: none
+     * Description: update ImageView of traffic lights
+     */
     public void updateTrafficLight() {
-        m_imageView = (ImageView) findViewById(R.id.imageView3);
-        current_image++;
-        current_image = current_image % images.length;
-        m_imageView.setImageResource(images[current_image]);
+        _m_imageView_trafficLight = (ImageView) findViewById(R.id.carImageViewTrafficLight1);
+        _m_current_image_trafficLight++;
+        _m_current_image_trafficLight = _m_current_image_trafficLight % _m_images_trafficLight.length;
+        _m_imageView_trafficLight.setImageResource(_m_images_trafficLight[_m_current_image_trafficLight]);
     }
-    /*Traffic Light Functions*/
 
-    /*GPS Information (Yiyang)*/
+    // GPS info functions
 
-    private static TextView m_gpsInformation;
-    static CarActivity instance;
-    LocationRequest locationRequest;
-    FusedLocationProviderClient fusedLocationProviderClient;
-    double utmLocationEasting;  // in meters
-    double utmLocationNorthing; // in meters
-    float currentSpeed; //in m/s
-
+    /*
+     * Input: none
+     * Return: none
+     * Description: get instance of CarActivity, called by LocationService
+     */
     public static CarActivity getInstance() {
-        return instance;
+        return _m_instance;
     }
 
-
-    private void updateLocation() {
-        buildLocationRequest();
-
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, getPendingIntent());
-
+    /*
+     * Input: UTMLocation object
+     * Return: none
+     * Description: update UTMLocation, called by LocationService
+     */
+    public void updateUtmLocation(UTMLocation location) {
+        _m_current_utm_location = location;
     }
 
-    private PendingIntent getPendingIntent() {
-        Intent intent = new Intent(this, LocationService.class);
-        intent.setAction(LocationService.ACTION_PROCESS_UPDATE);
-        return PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    /*
+     * Input: float number of speed
+     * Return: none
+     * Description: update speed, called by LocationService
+     */
+    public void updateSpeed(float speed) {
+        _m_current_speed = speed;
     }
 
-    //set the time interval and distance interval of request
-    private void buildLocationRequest() {
-        locationRequest = new LocationRequest();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(1000); // in milliseconds (1ms = 0.001s)
-        locationRequest.setFastestInterval(1000); // in milliseconds (1ms = 0.001s)
-        locationRequest.setSmallestDisplacement(0.5f); // in meters
-    }
-
-
-    //update current UTM Location Information for further use
-    public void updateUtmLocation(double easting, double northing) {
-        this.utmLocationEasting = easting;
-        this.utmLocationNorthing = northing;
-    }
-
-    //update current speed Information for further use
-    public void updateSpeedInfo(float speed) {
-        this.currentSpeed = speed;
-    }
-
-    public void updateLocationWGS(Location location) {
-        LatLng locationCurrent = new LatLng(location.getLatitude(), location.getLongitude());
-        gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locationCurrent, 19f));
-    }
-
-
-    /*only used for Textview for function testing  */
-    public void updateTextView(String value) {
+    /*
+     * Input: String of GPS and speed information
+     * Return: none
+     * Description: update GPS TextView, called by LocationService
+     */
+    public void updateGPSTextView(String value) {
         CarActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                m_gpsInformation.setText(value);
+                _m_textView_gpsInfo.setText(value);
             }
         });
     }
-    /*only used for Textview for function testing  */
-    /*Distance and necessary speed calculation(Yuanheng)*/
-    // Route from "Scharnweberstraße 132, 13405 Berlin" to "Scharnweberstraße 140, 13405 Berlin"
-    // with Speed 1X almost 4 m/s used to test
-    int timeLeft = 25; // second
-    public void updateDistanceToIntersection(UTMLocation curretnLocation, float speed){
-        if(intersectionLocation != null){
-            double distance = Utils.getUTMDistance(curretnLocation, intersectionLocation);
-            //Log.i("Distance",distance+" m");
-            double speed_nec = distance / timeLeft; // m/s
-            //Log.i("Necessary Speed",speed_nec+" m/s -> "+speed_nec*3.6+"km/h");
+
+    /*
+     * Input: UTMLocation object
+     * Return: none
+     * Description: update distance to intersection and calculate necessary speed, called by LocationService
+     *              Route from "Scharnweberstraße 132, 13405 Berlin" to "Scharnweberstraße 140, 13405 Berlin"
+     *              with Speed 1X almost 4 m/s used to test
+     */
+    public void updateDistanceToIntersection(UTMLocation curretnLocation){
+        if(_m_intersection_location != null){
+            double distance = Utils.getUTMDistance(curretnLocation, _m_intersection_location);
+            Log.i("Distance",distance+" m");
+            double speed_nec = distance / _m_timeLeft_cal_neceSpeed; // m/s
+            Log.i("Necessary Speed",speed_nec+" m/s -> "+speed_nec*3.6+"km/h");
         }
     }
 
-    /*GPS Information*/
 
-    /*Http Client and JSON Parser of Map Info(Yuanheng)*/
-    private static TextView m_MapInfo;
-    private MapInfo mapInfo;
-    UTMLocation intersectionLocation;
-    // Async processing
+    // map, spat info functions
+    /*
+     * Input: none
+     * Return: none
+     * Description: get json of mapInfo from server, parse it into object and update MapInfo TextView
+     */
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void updateMapInfoText() {
         Runnable runnable = new Runnable() {
             public void run() {
                 try {
                     String mapInfoStr = Utils.getMapInfoJson(getResources().getString(R.string.map_info_url));
-                    mapInfo = Utils.mapInfoParser(mapInfoStr);
-                    int intersectionID = mapInfo.map.intersection.intersectionID;
-                    intersectionLocation = new UTMLocation(mapInfo.map.intersection.positionUTM.east,mapInfo.map.intersection.positionUTM.north);
+                    _m_mapInfo = Utils.mapInfoParser(mapInfoStr);
+                    int intersectionID = _m_mapInfo.map.intersection.intersectionID;
+                    _m_intersection_location = new UTMLocation(_m_mapInfo.map.intersection.positionUTM.east,_m_mapInfo.map.intersection.positionUTM.north);
                     //Update view at main thread
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            m_MapInfo.setText("Intersection ID: " + String.valueOf(intersectionID));
+                            _m_textView_mapInfo.setText("Intersection ID: " + String.valueOf(intersectionID));
                         }
                     });
                 } catch (Exception e) {
@@ -208,28 +212,13 @@ public class CarActivity extends AppCompatActivity implements OnMapReadyCallback
         thread.start();
     }
 
-    /*Http Client and JSON Parser of Spat(Yuanheng)*/
-    // State and left Time of last signal group
-
-    private static TextView m_Spat;
-    //Update view at main thread
-    public void updateSpatText(Phases phasesLastSignalGroup) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                CurrentState currentState = phasesLastSignalGroup.getCurrentState();
-                currentState.setPostionWGS(mapInfo.map.intersection.lanes);
-                List<CurrentState> trafficLights = new ArrayList<>();
-                trafficLights.add(currentState);
-                getTrafficLights(trafficLights);
-                m_Spat.setText("Signal Group: " + currentState.signalGroupId + " "
-                        + currentState.state + " Left: " + currentState.timeLefts + " s");
-            }
-        });
-    }
-
-    // Async processing
-    public void requestSpat() {
+    /*
+     * Input: none
+     * Return: none
+     * Description: get json of spat from server, parse it into object and update spat TextView with
+     *              state and left Time of first signal group
+     */
+    public void updateSpatText() {
         Runnable runnable = new Runnable() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             public void run() {
@@ -241,7 +230,17 @@ public class CarActivity extends AppCompatActivity implements OnMapReadyCallback
                     int signalGroupId = movementStates.get(0).signalGroupId;
                     List<MovementEvent> movementEvents = movementStates.get(0).movementEvents;
                     Phases phasesLastSignalGroup = new Phases(timestamp, signalGroupId, movementEvents);
-                    updateSpatText(phasesLastSignalGroup);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            CurrentState currentState = phasesLastSignalGroup.getCurrentState();
+                            currentState.setPostionWGS(_m_mapInfo.map.intersection.lanes);
+                            List<CurrentState> trafficLights = new ArrayList<>();
+                            trafficLights.add(currentState);
+                            _m_textView_spat.setText("Signal Group: " + currentState.signalGroupId + " "
+                                    + currentState.state + " Left: " + currentState.timeLefts + " s");
+                        }
+                    });
                 } catch (Exception e) {
                     Log.w("Client", "Invalid Authorization or Server down. Please check AuthUrlInfo");
                     e.printStackTrace();
@@ -250,96 +249,6 @@ public class CarActivity extends AppCompatActivity implements OnMapReadyCallback
         };
         Thread thread = new Thread(runnable);
         thread.start();
-    }
-
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_car);
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-
-        m_textViewCountDown = findViewById(R.id.textView5);
-        m_btnStartSimulation = findViewById(R.id.button);
-        m_gpsInformation = findViewById(R.id.textView8);
-        m_MapInfo = findViewById(R.id.textView9);
-        m_Spat = findViewById(R.id.textView10);
-        m_btnStartSimulation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                timer();
-            }
-        });
-        updateCountDownText();
-
-        /*by Yuanheng*/
-        updateMapInfoText();
-        requestSpat();
-
-        /*by Yiyang*/
-        instance = this;
-        //ask permission for GPS Information request
-        Dexter.withContext(this)
-                .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-                .withListener(new PermissionListener() {
-                    @Override
-                    public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
-                        updateLocation();
-                    }
-
-                    @Override
-                    public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
-                        Toast.makeText(CarActivity.this, "You need to accept Location request", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
-
-                    }
-                }).check();
-    }
-    private GoogleMap gMap;
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        gMap = googleMap;
-        //LatLng intersection = new LatLng(52.564232999999994, 13.327774999999999);
-        //gMap.addMarker(new MarkerOptions().position(intersection).title("Reference Point of Intersection 14052"));
-        //gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(intersection, 19f));
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        gMap.setMyLocationEnabled(true);
-    }
-    public void getTrafficLights(List<CurrentState> trafficLights){
-        MarkerManager markerManager = new MarkerManager(gMap);
-        MarkerManager.Collection markerCollection = markerManager.newCollection();
-        //Log.i("test",String.valueOf(trafficLights.size()));
-        for(int i = 0; i < trafficLights.size(); i++){
-            markerCollection.addMarker(
-                    new MarkerOptions()
-                            .position(
-                                    new LatLng(
-                                            trafficLights.get(i).postionWGS.lat,
-                                            trafficLights.get(i).postionWGS.lng
-                                    )
-                            )
-                            .icon(BitmapDescriptorFactory.fromBitmap(getTrafficLightBitmap("STOP_AND_REMAIN")))
-                            .title("nameTest")
-            );
-        }
-    }
-    @SuppressLint("ResourceType")
-    public Bitmap getTrafficLightBitmap(String state){
-        InputStream is;
-        switch (state){
-            default:
-                is = getResources().openRawResource(R.drawable.red);
-                break;
-        }
-        Bitmap bm = BitmapFactory.decodeStream(is);
-        return Bitmap.createScaledBitmap(bm, bm.getWidth()/2, bm.getHeight()/2,true);
     }
 }
 

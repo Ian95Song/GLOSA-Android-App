@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -22,8 +23,17 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.collections.MarkerManager;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 public class WalkingActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -65,11 +75,15 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
     /*
      * Input: Location object from LocationService
      * Return: none
-     * Description: get current location information from LocationService and move camera of map view to current location
+     * Description: get current location information from LocationService,
+     *              move camera of map view to current location,
+     *              get street information
      */
-    public void updateLocationWGS(Location location) {
+    public void updateLocationWGS(Location location) throws IOException {
         LatLng locationCurrent = new LatLng(location.getLatitude(), location.getLongitude());
-        _m_gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locationCurrent, 19f));
+        if(_m_gMap != null) {
+            _m_gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locationCurrent, 19f));
+        }
     }
 
     /*
@@ -113,5 +127,4 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         // before return, bitmap was scaled
         return Bitmap.createScaledBitmap(bm, bm.getWidth()/2, bm.getHeight()/2,true);
     }
-
 }

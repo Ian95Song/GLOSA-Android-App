@@ -37,16 +37,16 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Login");
 
-        Button button=(Button)findViewById(R.id.loginButton);
-        _m_eText_username=(EditText)findViewById(R.id.loginEditTextUserName);
-        _m_eText_password=(EditText)findViewById(R.id.loginEditTextPassWord);
+        Button button = findViewById(R.id.loginButton);
+        _m_eText_username = findViewById(R.id.loginEditTextUserName);
+        _m_eText_password = findViewById(R.id.loginEditTextPassWord);
         _m_eText_password.setTransformationMethod(PasswordTransformationMethod.getInstance());
-        CheckBox rememberCheckbox=(CheckBox)findViewById(R.id.loginCheckBoxRemember);
-        CheckBox showCheckbox=(CheckBox)findViewById(R.id.loginCheckBoxShow);
+        CheckBox rememberCheckbox = findViewById(R.id.loginCheckBoxRemember);
+        CheckBox showCheckbox = findViewById(R.id.loginCheckBoxShow);
         readAuthFromLocal();
 
         showCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -141,7 +141,7 @@ public class LoginActivity extends AppCompatActivity {
     public void writeAuthToLocal(String username, String password){
         // write file
         File file = new File(getFilesDir(),"Authorization.txt");
-        Log.i("Auth",file.getAbsolutePath());
+        //Log.i("Auth",file.getAbsolutePath());
         FileOutputStream fos= null;
         try {
             fos = new FileOutputStream(file);

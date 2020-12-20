@@ -8,7 +8,7 @@ public class MapInfo {
 class Map{
     Intersection intersection;
 }
-class Intersection{
+class Intersection{ //needed
     PositionWGS84 positionWGS84;
     positionUTM positionUTM;
     int intersectionID;
@@ -25,6 +25,6 @@ class PositionWGS84{
     double lat;
 }
 class positionUTM{
-    double east;
+    double east;//
     double north;
 }

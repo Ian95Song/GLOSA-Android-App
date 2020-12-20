@@ -90,6 +90,7 @@ public class CarActivity extends AppCompatActivity {
     }
 
 
+    // return current position
     private void updateLocation() {
         buildLocationRequest();
 
@@ -144,6 +145,7 @@ public class CarActivity extends AppCompatActivity {
 
     /*Http Client and JSON Parser of Map Info(Yuanheng)*/
     private static TextView m_MapInfo;
+    private MapInfo m_mapInfo;
     // Async processing
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void updateMapInfoText() {
@@ -152,6 +154,7 @@ public class CarActivity extends AppCompatActivity {
                 try {
                     String mapInfoStr = Utils.getMapInfoJson();
                     MapInfo mapInfo = Utils.mapInfoParser(mapInfoStr);
+                    m_mapInfo = Utils.mapInfoParser(mapInfoStr);
                     int intersectionID = mapInfo.map.intersection.intersectionID;
                     //Update view at main thread
                     runOnUiThread(new Runnable() {
@@ -251,6 +254,16 @@ public class CarActivity extends AppCompatActivity {
 
                     }
                 }).check();
+    }
+    // possible SGs for bicycle: 7, 8, 9, 10, 11
+    private void estimateDrivingLine() {
+        /*
+        this.utmLocationEasting
+                this.utmLocationNorthing
+                        this.m_mapInfo.map.intersection.lanes
+         */
+
+
     }
 
 }

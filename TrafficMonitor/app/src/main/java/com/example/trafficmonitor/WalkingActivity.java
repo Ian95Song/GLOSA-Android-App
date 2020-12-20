@@ -10,6 +10,7 @@ import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,7 +21,10 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.collections.MarkerManager;
 
 import java.io.BufferedReader;
@@ -39,6 +43,7 @@ import java.util.List;
 public class WalkingActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static WalkingActivity _m_instance;
     private GoogleMap _m_gMap;
+    private Location _m_location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,11 +83,29 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
      * Description: get current location information from LocationService,
      *              move camera of map view to current location,
      *              get street information
+     *              add speed information on the map
+     *              add travel trajectory on the map
      */
     public void updateLocationWGS(Location location) throws IOException {
         LatLng locationCurrent = new LatLng(location.getLatitude(), location.getLongitude());
+        float speedCurrent = (float) (location.getSpeed() * 3.6); //in km/h
         if(_m_gMap != null) {
             _m_gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locationCurrent, 19f));
+            //add speed information on the current location
+            Marker markerCurrent = _m_gMap.addMarker(new MarkerOptions()
+                    .position(locationCurrent).alpha(0.0f)
+                    .title(String.format("%.1f km/h",speedCurrent)));
+            markerCurrent.showInfoWindow();
+            //add red trajectory line on the map
+            if (_m_location !=null){
+                Polyline line = _m_gMap.addPolyline(new PolylineOptions()
+                        .add(locationCurrent, new LatLng(_m_location.getLatitude(),_m_location.getLongitude()))
+                        .width(5)
+                        .color(Color.RED));
+            }
+            _m_location=location;
+
+
         }
     }
 

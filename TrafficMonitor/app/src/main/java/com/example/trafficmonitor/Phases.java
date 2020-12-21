@@ -7,6 +7,7 @@ import androidx.annotation.RequiresApi;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 class CurrentState {
@@ -36,6 +37,7 @@ public class Phases {
     private List<String> stateSequence;
     private List<Integer> relativeLikelyTime; // relativ second in current circulation
     private int circulationTime;
+    private HashMap<String,Integer> statesTimeLeft;
     private CurrentState currentState;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -43,13 +45,19 @@ public class Phases {
         this.signalGroupId = signalGroupId;
         this.stateSequence = new ArrayList<>();
         this.relativeLikelyTime = new ArrayList<>();
+        this.statesTimeLeft = new HashMap<>();
         this.firstStateLikelyTime = movementEvents.get(0).timeChange.likelyTime / 10;
         this.stateSequence.add(movementEvents.get(0).phaseState);
         this.relativeLikelyTime.add(0);
         for(int i = 1; i < 4; i++) {
             this.stateSequence.add(movementEvents.get(i).phaseState);
             this.relativeLikelyTime.add(movementEvents.get(i).timeChange.likelyTime/10 -this.firstStateLikelyTime);
+
+            statesTimeLeft.put(movementEvents.get(i).phaseState,
+                    movementEvents.get(i).timeChange.likelyTime/10-movementEvents.get(i-1).timeChange.likelyTime/10);
         }
+        statesTimeLeft.put(movementEvents.get(4).phaseState,
+                movementEvents.get(4).timeChange.likelyTime/10-movementEvents.get(3).timeChange.likelyTime/10);
         this.circulationTime = 0;
         this.circulationTime = movementEvents.get(4).timeChange.likelyTime/10 -this.firstStateLikelyTime;
     }
@@ -95,5 +103,8 @@ public class Phases {
     public CurrentState getCurrentState(){
         this.calculateCurrentState();
         return this.currentState;
+    }
+    public HashMap<String, Integer> getStatesTimeLeft(){
+        return statesTimeLeft;
     }
 }

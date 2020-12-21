@@ -8,8 +8,21 @@
     <include
         android:id="@+id/toolbar"
         layout="@layout/toolbar" />
+
+    <ScrollView
+        android:id="@+id/carScrollViewTrafficLight"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fadingEdge="vertical"
+        android:scrollbars="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="0dp"></ScrollView>
+
     <ImageView
         android:id="@+id/carImageViewTrafficLight1"
+        android:visibility="invisible"
         android:layout_width="115dp"
         android:layout_height="119dp"
         android:layout_marginStart="16dp"
@@ -20,6 +33,7 @@
         app:srcCompat="@drawable/red" />
     <ImageView
         android:id="@+id/carImageViewTrafficLight2"
+        android:visibility="invisible"
         android:layout_width="115dp"
         android:layout_height="119dp"
         android:layout_marginTop="168dp"
@@ -29,6 +43,7 @@
         app:srcCompat="@drawable/red" />
     <ImageView
         android:id="@+id/carImageViewTrafficLight3"
+        android:visibility="invisible"
         android:layout_width="115dp"
         android:layout_height="119dp"
         android:layout_marginTop="168dp"
@@ -39,6 +54,7 @@
         app:srcCompat="@drawable/red" />
     <TextView
         android:id="@+id/carTextViewStreet1"
+        android:visibility="invisible"
         android:layout_width="115dp"
         android:layout_height="90dp"
         android:layout_marginTop="12dp"
@@ -51,6 +67,7 @@
         app:layout_constraintTop_toBottomOf="@+id/carImageViewTrafficLight1" />
     <TextView
         android:id="@+id/carTextViewStreet2"
+        android:visibility="invisible"
         android:layout_width="115dp"
         android:layout_height="90dp"
         android:layout_marginTop="12dp"
@@ -64,6 +81,7 @@
         app:layout_constraintTop_toBottomOf="@+id/carImageViewTrafficLight2" />
     <TextView
         android:id="@+id/carTextViewStreet3"
+        android:visibility="invisible"
         android:layout_width="115dp"
         android:layout_height="90dp"
         android:layout_marginTop="12dp"
@@ -77,6 +95,7 @@
         app:layout_constraintTop_toBottomOf="@+id/carImageViewTrafficLight3" />
     <TextView
         android:id="@+id/carTextViewTimer1"
+        android:visibility="invisible"
         android:layout_width="72dp"
         android:layout_height="72dp"
         android:layout_marginTop="24dp"
@@ -91,6 +110,7 @@
         app:layout_constraintVertical_bias="0.0" />
     <TextView
         android:id="@+id/carTextViewTimer2"
+        android:visibility="invisible"
         android:layout_width="72dp"
         android:layout_height="72dp"
         android:layout_marginBottom="236dp"
@@ -105,6 +125,7 @@
         app:layout_constraintVertical_bias="0.705" />
     <TextView
         android:id="@+id/carTextViewTimer3"
+        android:visibility="invisible"
         android:layout_width="72dp"
         android:layout_height="72dp"
         android:layout_marginBottom="220dp"
@@ -119,6 +140,7 @@
         app:layout_constraintVertical_bias="0.48" />
     <TextView
         android:id="@+id/carTextViewGPS"
+        android:visibility="invisible"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="GPS Informations"
@@ -132,6 +154,7 @@
         app:layout_constraintVertical_bias="0.136" />
     <TextView
         android:id="@+id/carTextViewMapInfo"
+        android:visibility="invisible"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Map Info"
@@ -145,6 +168,7 @@
         app:layout_constraintVertical_bias="0.134" />
     <TextView
         android:id="@+id/carTextViewTrafficLightState"
+        android:visibility="invisible"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Spat"
@@ -158,6 +182,7 @@
         app:layout_constraintVertical_bias="0.134" />
     <Button
         android:id="@+id/carButtonTest"
+        android:visibility="invisible"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="240dp"

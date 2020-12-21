@@ -91,7 +91,8 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
      * Return: none
      * Description: show traffic lights with their positions and states at map view
      */
-    public void showTrafficLights(List<CurrentState> trafficLights){
+    public void showTrafficLights(){
+        /*
         MarkerManager markerManager = new MarkerManager(_m_gMap);
         MarkerManager.Collection markerCollection = markerManager.newCollection();
         //Log.i("test",String.valueOf(trafficLights.size()));
@@ -108,6 +109,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
                             .title("nameTest")
             );
         }
+        */
     }
 
     /*

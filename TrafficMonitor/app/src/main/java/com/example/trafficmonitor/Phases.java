@@ -32,6 +32,7 @@ class CurrentState {
 }
 
 public class Phases {
+    private long timestamp;
     private int signalGroupId;
     private int firstStateLikelyTime; // second in current hour
     private List<String> stateSequence;
@@ -42,6 +43,7 @@ public class Phases {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public Phases(Long timestamp, int signalGroupId, List<MovementEvent> movementEvents){
+        this.timestamp = timestamp;
         this.signalGroupId = signalGroupId;
         this.stateSequence = new ArrayList<>();
         this.relativeLikelyTime = new ArrayList<>();

@@ -17,8 +17,23 @@
         android:scrollbars="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:layout_editor_absoluteX="0dp"></ScrollView>
+    <RelativeLayout
+        android:id="@+id/carLoadingPanel"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center" >
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true" />
+    </RelativeLayout>
 
     <ImageView
         android:id="@+id/carImageViewTrafficLight1"
@@ -31,27 +46,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/red" />
-    <ImageView
-        android:id="@+id/carImageViewTrafficLight2"
-        android:visibility="invisible"
-        android:layout_width="115dp"
-        android:layout_height="119dp"
-        android:layout_marginTop="168dp"
-        app:layout_constraintEnd_toStartOf="@+id/carImageViewTrafficLight3"
-        app:layout_constraintStart_toEndOf="@+id/carImageViewTrafficLight1"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/red" />
-    <ImageView
-        android:id="@+id/carImageViewTrafficLight3"
-        android:visibility="invisible"
-        android:layout_width="115dp"
-        android:layout_height="119dp"
-        android:layout_marginTop="168dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.903"
-        app:layout_constraintStart_toEndOf="@+id/carImageViewTrafficLight1"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/red" />
     <TextView
         android:id="@+id/carTextViewStreet1"
         android:visibility="invisible"
@@ -62,37 +56,8 @@
         android:textColor="#000000"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/carTextViewStreet2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/carImageViewTrafficLight1" />
-    <TextView
-        android:id="@+id/carTextViewStreet2"
-        android:visibility="invisible"
-        android:layout_width="115dp"
-        android:layout_height="90dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:text="From Pascalstr. to Sewanstr."
-        android:textColor="#000000"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/carTextViewStreet3"
-        app:layout_constraintTop_toBottomOf="@+id/carImageViewTrafficLight2" />
-    <TextView
-        android:id="@+id/carTextViewStreet3"
-        android:visibility="invisible"
-        android:layout_width="115dp"
-        android:layout_height="90dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:text="From Pascalstr. to Sewanstr."
-        android:textColor="#000000"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/carImageViewTrafficLight3" />
     <TextView
         android:id="@+id/carTextViewTimer1"
         android:visibility="invisible"
@@ -108,36 +73,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/carTextViewStreet1"
         app:layout_constraintVertical_bias="0.0" />
-    <TextView
-        android:id="@+id/carTextViewTimer2"
-        android:visibility="invisible"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
-        android:layout_marginBottom="236dp"
-        android:text="60"
-        android:textColor="@color/black"
-        android:textSize="60dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/carTextViewStreet2"
-        app:layout_constraintVertical_bias="0.705" />
-    <TextView
-        android:id="@+id/carTextViewTimer3"
-        android:visibility="invisible"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
-        android:layout_marginBottom="220dp"
-        android:text="60"
-        android:textColor="@color/black"
-        android:textSize="60dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.887"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/carTextViewStreet3"
-        app:layout_constraintVertical_bias="0.48" />
     <TextView
         android:id="@+id/carTextViewGPS"
         android:visibility="invisible"
@@ -166,31 +101,4 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/carTextViewGPS"
         app:layout_constraintVertical_bias="0.134" />
-    <TextView
-        android:id="@+id/carTextViewTrafficLightState"
-        android:visibility="invisible"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Spat"
-        android:textColor="@color/black"
-        android:textSize="25dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.059"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/carTextViewMapInfo"
-        app:layout_constraintVertical_bias="0.134" />
-    <Button
-        android:id="@+id/carButtonTest"
-        android:visibility="invisible"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="240dp"
-        android:text="Test"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/carTextViewStreet2"
-        app:layout_constraintVertical_bias="0.87" />
 </androidx.constraintlayout.widget.ConstraintLayout>

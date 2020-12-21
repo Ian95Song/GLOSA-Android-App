@@ -28,11 +28,7 @@ import java.util.Locale;
 public class CarActivity extends AppCompatActivity {
 
     // Traffic light timer parameters
-    private TextView _m_textViewCountDown;
-    private Button _m_btnStartSimulation;
-    private CountDownTimer _m_countDownTimer;
     private long _m_timeLeftInMillis = 6000;
-    private ImageView _m_imageView_trafficLight;
     private int _m_current_image_trafficLight;
     private int[] _m_images_trafficLight = {R.drawable.red, R.drawable.red_yellow, R.drawable.green,R.drawable.yellow};
     private String[] _m_state_trafficLight = {"STOP_AND_REMAIN","PRE_MOVEMENT","PROTECTED_MOVEMENT_ALLOWED","PROTECTED_CLEARANCE"};
@@ -51,7 +47,6 @@ public class CarActivity extends AppCompatActivity {
     private TextView _m_textView_mapInfo;
     private MapInfo _m_mapInfo;
     private UTMLocation _m_intersection_location;
-    private TextView _m_textView_spat;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -60,33 +55,21 @@ public class CarActivity extends AppCompatActivity {
         setContentView(R.layout.activity_car);
         _m_context = this.getApplicationContext();
         _m_idDictionary = new HashMap<String, Integer>();
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Car Activity");
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
-
-        _m_textViewCountDown = findViewById(R.id.carTextViewTimer1);
-        _m_btnStartSimulation = findViewById(R.id.carButtonTest);
         _m_textView_gpsInfo = findViewById(R.id.carTextViewGPS);
         _m_textView_mapInfo = findViewById(R.id.carTextViewMapInfo);
-        _m_textView_spat = findViewById(R.id.carTextViewTrafficLightState);
-        _m_btnStartSimulation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //timer();
-            }
-        });
-
-        //Traffic light timer
-        //updateCountDownText();
 
         // GPS info
         _m_instance = this;
 
         // map, spat info
         updateMapInfoText();
-        updateSpatText();
+        updateSpat();
     }
 
     /*
@@ -121,7 +104,7 @@ public class CarActivity extends AppCompatActivity {
         }
         updateTrafficLight();
         _m_timeLeftInMillis = timeLefts*1000;
-        _m_countDownTimer = new CountDownTimer(_m_timeLeftInMillis, 1000) {
+        CountDownTimer countDownTimer = new CountDownTimer(_m_timeLeftInMillis, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 _m_timeLeftInMillis = millisUntilFinished;
@@ -129,7 +112,6 @@ public class CarActivity extends AppCompatActivity {
             }
             @Override
             public void onFinish() {
-                //_m_timeLeftInMillis = 6000;
                 _m_current_image_trafficLight++;
                 _m_current_image_trafficLight = _m_current_image_trafficLight % _m_images_trafficLight.length;
                 timer(_m_state_trafficLight[_m_current_image_trafficLight],_m_time_trafficLight[_m_current_image_trafficLight]);
@@ -147,7 +129,6 @@ public class CarActivity extends AppCompatActivity {
         String timeLeftFormatted = String.format(Locale.getDefault(), "%02d", seconds);
         TextView textView = (TextView) findViewById(_m_idDictionary.get("timer1"));
         textView.setText(timeLeftFormatted);
-        //_m_textViewCountDown.setText(timeLeftFormatted);
     }
 
     /*
@@ -157,8 +138,6 @@ public class CarActivity extends AppCompatActivity {
      */
     public void updateTrafficLight() {
         ImageView imageView = (ImageView) findViewById(_m_idDictionary.get("trafficLight1"));
-        //_m_imageView_trafficLight = (ImageView) findViewById(R.id.carImageViewTrafficLight1);
-        //_m_imageView_trafficLight.setImageResource(_m_images_trafficLight[_m_current_image_trafficLight]);
         imageView.setImageResource(_m_images_trafficLight[_m_current_image_trafficLight]);
     }
 
@@ -262,7 +241,7 @@ public class CarActivity extends AppCompatActivity {
      *              add ImageViews of traffic light
      *              update spat TextView with state and left Time of first signal group
      */
-    public void updateSpatText() {
+    public void updateSpat() {
         Runnable runnable = new Runnable() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             public void run() {
@@ -285,7 +264,6 @@ public class CarActivity extends AppCompatActivity {
                             paramsIntersection.gravity = Gravity.CENTER;
                             textViewIntersection.setLayoutParams(paramsIntersection);
                             linearVertical.addView(textViewIntersection);
-
 
                             for (int i = 0; i < movementStates.size()/3 + 1; i++) {
                                 LinearLayout linearHorizontal = new LinearLayout(getContext());
@@ -350,22 +328,18 @@ public class CarActivity extends AppCompatActivity {
                     int signalGroupId = movementStates.get(0).signalGroupId;
                     List<MovementEvent> movementEvents = movementStates.get(0).movementEvents;
                     Phases phasesFirstSignalGroup = new Phases(timestamp, signalGroupId, movementEvents);
+                    HashMap<String, Integer> statesTimeLeft = phasesFirstSignalGroup.getStatesTimeLeft();
+                    CurrentState currentState = phasesFirstSignalGroup.getCurrentState();
+                    currentState.setPostionWGS(_m_mapInfo.map.intersection.lanes);
+                    _m_time_trafficLight[0] = statesTimeLeft.get("STOP_AND_REMAIN");
+                    _m_time_trafficLight[1] = statesTimeLeft.get("PRE_MOVEMENT");
+                    _m_time_trafficLight[2] = statesTimeLeft.get("PROTECTED_MOVEMENT_ALLOWED");
+                    _m_time_trafficLight[3] = statesTimeLeft.get("PROTECTED_CLEARANCE");
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            CurrentState currentState = phasesFirstSignalGroup.getCurrentState();
-                            currentState.setPostionWGS(_m_mapInfo.map.intersection.lanes);
-                            // add time of trafficlight state
-                            HashMap<String, Integer> statesTimeLeft = phasesFirstSignalGroup.getStatesTimeLeft();
-                            _m_time_trafficLight[0] = statesTimeLeft.get("STOP_AND_REMAIN");
-                            _m_time_trafficLight[1] = statesTimeLeft.get("PRE_MOVEMENT");
-                            _m_time_trafficLight[2] = statesTimeLeft.get("PROTECTED_MOVEMENT_ALLOWED");
-                            _m_time_trafficLight[3] = statesTimeLeft.get("PROTECTED_CLEARANCE");
+                            findViewById(R.id.carLoadingPanel).setVisibility(View.GONE);
                             timer(currentState.state, currentState.timeLefts);
-                            List<CurrentState> trafficLights = new ArrayList<>();
-                            trafficLights.add(currentState);
-                            _m_textView_spat.setText("Signal Group: " + currentState.signalGroupId + " "
-                                    + currentState.state + " Left: " + currentState.timeLefts + " s");
                         }
                     });
                 } catch (Exception e) {

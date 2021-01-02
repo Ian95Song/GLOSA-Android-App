@@ -83,6 +83,15 @@ public class CarActivity extends AppCompatActivity {
 
     /*
      * Input: none
+     * Return: none
+     * Description: get instance of CarActivity, called by LocationService
+     */
+    public static CarActivity getInstance() {
+        return _m_instance;
+    }
+
+    /*
+     * Input: none
      * Return: Context object
      * Description: get context of CarActivity
      */
@@ -126,7 +135,7 @@ public class CarActivity extends AppCompatActivity {
      * Return: none
      * Description: calculate current state of a traffic light
      */
-    public String calculateCurrentState(int signalGroupId){
+    private String calculateCurrentState(int signalGroupId){
         int firstStateLikelyTime = _m_spat.intersectionStates.get(0).movementStates.get(signalGroupId-1).movementEvents.get(0).timeChange.likelyTime / 10;
         List<String> stateSequence = new ArrayList<>();
         List<Integer> relativeLikelyTime = new ArrayList<>();
@@ -193,16 +202,6 @@ public class CarActivity extends AppCompatActivity {
     }
 
     // GPS info functions
-
-    /*
-     * Input: none
-     * Return: none
-     * Description: get instance of CarActivity, called by LocationService
-     */
-    public static CarActivity getInstance() {
-        return _m_instance;
-    }
-
     /*
      * Input: UTMLocation object
      * Return: none
@@ -292,7 +291,7 @@ public class CarActivity extends AppCompatActivity {
      *              add ImageViews of traffic light
      *              update spat TextView with state and left Time of first signal group
      */
-    public void updateSpat() {
+    private void updateSpat() {
         Runnable runnable = new Runnable() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             public void run() {

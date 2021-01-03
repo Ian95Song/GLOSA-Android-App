@@ -20,7 +20,7 @@ class CurrentState {
         this.signalGroupId = signalGroupId;
     }
 
-    public void setPostionWGS(List<Lanes> lanes) {
+    public void setPostionWGS(List<Lane> lanes) {
         for(int i = 0; i < lanes.size(); i++){
             if(lanes.get(i).signalGroup == this.signalGroupId){
                 this.postionWGS = lanes.get(i).positionWGS84;

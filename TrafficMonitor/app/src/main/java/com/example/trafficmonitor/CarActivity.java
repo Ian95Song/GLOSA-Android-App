@@ -132,6 +132,24 @@ public class CarActivity extends AppCompatActivity {
     }
 
     /*
+     * Input: none
+     * Return: none
+     * Description: get object of mapInfo
+     */
+    public MapInfo getMapInfo() {
+        return _m_mapInfo;
+    }
+
+    /*
+     * Input: none
+     * Return: none
+     * Description: get object of mapInfo
+     */
+    public UTMLocation getIntersectionUTMLocation() {
+        return _m_intersection_location;
+    }
+
+    /*
      * Input: UTMLocation object
      * Return: none
      * Description: update UTMLocation, called by LocationService

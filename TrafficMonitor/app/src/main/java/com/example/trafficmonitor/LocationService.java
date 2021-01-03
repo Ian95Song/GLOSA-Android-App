@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.location.LocationResult;
 
@@ -33,14 +32,13 @@ public class LocationService extends BroadcastReceiver {
                             CarActivity.getInstance().updateUtmLocation(utmLocation);
                             CarActivity.getInstance().updateSpeed(location.getSpeed());
                             CarActivity.getInstance().updateDistanceToIntersection(utmLocation);
-
                         }
                         if(WalkingActivity.getInstance() != null) {
                             WalkingActivity.getInstance().updateLocationWGS(location);
+                            WalkingActivity.getInstance().updateDistanceToIntersection(utmLocation);
                         }
                     } catch (Exception ex) {
                         Log.e("LocationService",ex.toString());
-                        //Toast.makeText(context, locationString, Toast.LENGTH_SHORT).show();
                     }
                 }
             }

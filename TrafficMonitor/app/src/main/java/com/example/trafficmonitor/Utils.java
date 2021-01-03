@@ -1,6 +1,5 @@
 package com.example.trafficmonitor;
 import android.os.Build;
-import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
@@ -16,16 +15,12 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Date;
 import java.util.List;
 
 public class Utils {
     private static String _s_username = "username";
     private static String _s_password = "password";
-
     /*
      * Input: none
      * Return: String of basic authorization information
@@ -128,6 +123,18 @@ public class Utils {
     }
 
     /*
+     * Input: String path of json file
+     * Return: JSONfromKML object of lane
+     * Description:
+     */
+    protected static JSONfromKML laneParser(String jsonString) {
+        Gson gson = new Gson();
+        Type laneType = new TypeToken<JSONfromKML>(){}.getType();
+        JSONfromKML lane = gson.fromJson(jsonString, laneType);
+        return lane;
+    }
+
+    /*
      * Input: UTMLocation objects of two points
      * Return: double number of distance between two input points
      * Description: measurement unit with meter
@@ -136,5 +143,43 @@ public class Utils {
         double distance = Math.sqrt(
                 Math.pow(location2.m_east-location1.m_east,2) + Math.pow(location2.m_north-location1.m_north,2));
         return distance;
+    }
+
+    /*
+     * Input: UTMLocation objects of points
+     * Return: double number of linear regression alpha
+     * Description: calculate parameter of linear regression: y = ax + b, x: east, y: north
+     */
+    protected static double getLinearRegressionAlpha(List<UTMLocation> locationList){
+        int n = locationList.size();
+        double sumX = 0;
+        double sumY = 0;
+        double sumXY = 0;
+        double sumXX = 0;
+        for (UTMLocation location : locationList){
+            sumX += location.m_east;
+            sumY += location.m_north;
+            sumXY += location.m_east * location.m_north;
+            sumXX += Math.pow(location.m_east, 2);
+        }
+        double alpha = (((sumY * sumX) / n) - sumXY) / (((sumX * sumX) / n) - sumXX);
+        return alpha;
+    }
+
+    /*
+     * Input: UTMLocation objects of points
+     * Return: double number of linear regression beta
+     * Description: calculate parameter of linear regression: y = ax + b, x: east, y: north
+     */
+    protected static double getLinearRegressionBeta(List<UTMLocation> locationList, double alpha){
+        int n = locationList.size();
+        double sumX = 0;
+        double sumY = 0;
+        for (UTMLocation location : locationList){
+            sumX += location.m_east;
+            sumY += location.m_north;
+        }
+        double beta = (sumY - alpha * sumX) / n;
+        return beta;
     }
 }

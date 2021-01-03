@@ -12,9 +12,9 @@ class Intersection{
     PositionWGS84 positionWGS84;
     PositionUTM positionUTM;
     int intersectionID;
-    List<Lanes> lanes;
+    List<Lane> lanes;
 }
-class Lanes{
+class Lane{
     PositionWGS84 positionWGS84;
     PositionUTM positionUTM;
     int id;

@@ -15,6 +15,8 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,6 +50,11 @@ import java.util.TimerTask;
 
 public class WalkingActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static WalkingActivity _m_instance;
+    private ImageButton[] _m_imageButtons = new ImageButton[2];
+    private ImageButton _m_imageButton_unfocus;
+    private int[] _m_imageButton_id = {R.id.walkingImageButtonCar, R.id.walkingImageButtonBicycle};
+    private String[] _m_modes = {"vehicle", "bikeLane"};
+    private String _m_mode_selected;
     private JSONfromKML _m_lanes;
     private GoogleMap _m_gMap;
     private List<Lane> _m_trafficLights;
@@ -62,15 +69,41 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Walking Activity");
+        getSupportActionBar().setTitle("Map View");
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        for(int i = 0; i < _m_imageButtons.length; i++){
+            _m_imageButtons[i] = findViewById(_m_imageButton_id[i]);
+            _m_imageButtons[i].setBackgroundColor(Color.rgb(232, 232, 232));
+            _m_imageButtons[i].setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    switch (v.getId()){
+                        case R.id.walkingImageButtonCar :
+                            setFocus(_m_imageButton_unfocus, _m_imageButtons[0]);
+                            _m_mode_selected = _m_modes[0];
+                            break;
+
+                        case R.id.walkingImageButtonBicycle :
+                            setFocus(_m_imageButton_unfocus, _m_imageButtons[1]);
+                            _m_mode_selected = _m_modes[1];
+                            break;
+                    }
+                }
+            });
+        }
+        // init car imageButton selected
+        _m_imageButton_unfocus = _m_imageButtons[0];
+        setFocus(_m_imageButton_unfocus, _m_imageButtons[1]);
+        _m_mode_selected = _m_modes[1];
+
         _m_instance = this;
         _m_locationList = new ArrayList<>();
         _m_determinated = false;
+
 
         getLanesInfo();
     }
@@ -94,6 +127,17 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         if(_m_trafficLights != null){
             //showTrafficLights();
         }
+    }
+
+    /*
+     * Input: none
+     * Return: none
+     * Description: get lanes info from assets json file and parse it into object
+     */
+    private void setFocus(ImageButton btn_unfocus, ImageButton btn_focus){
+        btn_unfocus.setBackgroundColor(Color.rgb(232, 232, 232));
+        btn_focus.setBackgroundColor(Color.rgb(181, 181, 181));
+        _m_imageButton_unfocus = btn_focus;
     }
 
     public static WalkingActivity getInstance() {
@@ -184,7 +228,7 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
             _m_gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locationCurrent, 19f));
             //add speed information on the current location
 
-
+            Log.i("Current Speed", String.format("%.1f km/h",speedCurrent));
             //Marker markerCurrent = _m_gMap.addMarker(new MarkerOptions()
             //        .position(locationCurrent).alpha(0.0f)
             //        .title(String.format("%.1f km/h",speedCurrent)));
@@ -268,18 +312,20 @@ public class WalkingActivity extends AppCompatActivity implements OnMapReadyCall
         double determinatedDistance = Double.POSITIVE_INFINITY;
         for( Feature feature : _m_lanes.features){
             int laneId = feature.properties.laneId;
+            String laneType = feature.properties.laneType;
             double minDistance = Double.POSITIVE_INFINITY;
-
-            for(UTMLocation location : addPointsToLanes(feature.geometry.coordinates)){
-                double distance = Utils.getUTMDistance(currentLocation, location);
-                if(distance < minDistance){
-                    minDistance = distance;
+            if(laneType.equals(_m_mode_selected)){
+                for(UTMLocation location : addPointsToLanes(feature.geometry.coordinates)){
+                    double distance = Utils.getUTMDistance(currentLocation, location);
+                    if(distance < minDistance){
+                        minDistance = distance;
+                    }
                 }
-            }
 
-            if(minDistance < determinatedDistance){
-                determinatedDistance = minDistance;
-                determinatedLaneId = laneId;
+                if(minDistance < determinatedDistance){
+                    determinatedDistance = minDistance;
+                    determinatedLaneId = laneId;
+                }
             }
         }
         int determinatedSignalGroupId = getSignalGroupOfLane(determinatedLaneId);

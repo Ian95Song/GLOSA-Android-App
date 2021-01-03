@@ -28,10 +28,10 @@ public class LocationService extends BroadcastReceiver {
                             .toString();
                     try {
                         if(CarActivity.getInstance() != null){
-                            CarActivity.getInstance().updateGPSTextView(locationString);
-                            CarActivity.getInstance().updateUtmLocation(utmLocation);
-                            CarActivity.getInstance().updateSpeed(location.getSpeed());
-                            CarActivity.getInstance().updateDistanceToIntersection(utmLocation);
+                            //CarActivity.getInstance().updateGPSTextView(locationString);
+                            //CarActivity.getInstance().updateUtmLocation(utmLocation);
+                            //CarActivity.getInstance().updateSpeed(location.getSpeed());
+                            //CarActivity.getInstance().updateDistanceToIntersection(utmLocation);
                         }
                         if(WalkingActivity.getInstance() != null) {
                             WalkingActivity.getInstance().updateLocationWGS(location);

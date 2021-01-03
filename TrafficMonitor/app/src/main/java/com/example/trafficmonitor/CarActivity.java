@@ -67,7 +67,7 @@ public class CarActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Car Activity");
+        getSupportActionBar().setTitle("Traffic Light Monitor");
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
         _m_textView_gpsInfo = findViewById(R.id.carTextViewGPS);

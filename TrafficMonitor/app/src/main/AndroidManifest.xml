@@ -32,14 +32,9 @@
         </activity>
         <receiver android:name=".LocationService" />
         <activity
-            android:name=".BicycleActivity"
-            android:parentActivityName=".MainActivity" />
-        <activity
             android:name=".CarActivity"
             android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".WalkingActivity"
-            android:parentActivityName=".MainActivity"/>
+
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

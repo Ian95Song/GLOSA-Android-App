@@ -33,9 +33,9 @@ public class LocationService extends BroadcastReceiver {
                             //CarActivity.getInstance().updateSpeed(location.getSpeed());
                             //CarActivity.getInstance().updateDistanceToIntersection(utmLocation);
                         }
-                        if(WalkingActivity.getInstance() != null) {
-                            WalkingActivity.getInstance().updateLocationWGS(location);
-                            WalkingActivity.getInstance().updateDistanceToIntersection(utmLocation);
+                        if(MainActivity.getInstance() != null) {
+                            MainActivity.getInstance().updateLocationWGS(location);
+                            MainActivity.getInstance().updateDistanceToIntersection(utmLocation);
                         }
                     } catch (Exception ex) {
                         Log.e("LocationService",ex.toString());

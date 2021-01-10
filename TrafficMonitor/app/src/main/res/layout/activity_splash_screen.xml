@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="199dp"
         android:fontFamily="@font/bangers"
-        android:text="Traffic Monitor"
+        android:text="Traffic Ligtht Service"
         android:textColor="#169c7c"
         android:textSize="50dp"
         app:layout_constraintBottom_toBottomOf="parent"

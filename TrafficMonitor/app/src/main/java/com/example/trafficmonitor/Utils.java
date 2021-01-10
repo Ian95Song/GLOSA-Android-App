@@ -15,12 +15,14 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
 public class Utils {
     private static String _s_username = "username";
     private static String _s_password = "password";
+
     /*
      * Input: none
      * Return: String of basic authorization information
@@ -181,5 +183,31 @@ public class Utils {
         }
         double beta = (sumY - alpha * sumX) / n;
         return beta;
+    }
+
+    /*
+     * Input: none
+     * Return: none
+     * Description: add points into lanes, e.g. add the middle point of two neighbouring points on a lane
+     */
+    protected static List<UTMLocation> addPointsToLanes(List<List<Double>> coordinates){
+        List<UTMLocation> rawLocations = new ArrayList<>();
+        for(List<Double> coordinate : coordinates){
+            UTMLocation utmLocation = new UTMLocation();
+            utmLocation.getUTMLocationFromWGS(coordinate.get(1),coordinate.get(0));
+            rawLocations.add(utmLocation);
+        }
+
+        List<UTMLocation> addedPointsLocations = new ArrayList<>();
+        for(int i = 0; i < rawLocations.size(); i++){
+            addedPointsLocations.add(rawLocations.get(i));
+            if(i < rawLocations.size() - 1){
+                double middleEast = (rawLocations.get(i).m_east + rawLocations.get(i+1).m_east) / 2;
+                double middleNorth = (rawLocations.get(i).m_north + rawLocations.get(i+1).m_north) / 2;
+                UTMLocation middleLocation = new UTMLocation(middleEast, middleNorth);
+                addedPointsLocations.add(middleLocation);
+            }
+        }
+        return addedPointsLocations;
     }
 }

@@ -5,54 +5,39 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
-    <TextView
-        android:id="@+id/mainTextViewTitle"
-        android:layout_width="wrap_content"
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
+    <fragment
+        android:id="@+id/map"
+        class="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="52dp"
-        android:layout_marginBottom="660dp"
-        android:fontFamily="@font/bangers"
-        android:text="Drive Mode"
-        android:textColor="#009688"
-        android:textColorLink="#000000"
-        android:textSize="60dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-    <ImageButton
-        android:id="@+id/mainImageButtonCar"
-        android:layout_width="100dp"
-        android:layout_height="90dp"
-        android:layout_marginTop="232dp"
-        android:layout_marginBottom="294dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/mainImageButtonBicycle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mainTextViewTitle"
-        app:srcCompat="@drawable/ic_action_name" />
-    <ImageButton
-        android:id="@+id/mainImageButtonBicycle"
-        android:layout_width="100dp"
-        android:layout_height="90dp"
-        android:layout_marginTop="232dp"
-        android:layout_marginBottom="294dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
-        app:layout_constraintEnd_toStartOf="@+id/mainImageButtonWalking"
-        app:layout_constraintStart_toEndOf="@+id/mainImageButtonCar"
-        app:layout_constraintTop_toBottomOf="@+id/mainTextViewTitle"
-        app:srcCompat="@drawable/bicycle_icon" />
-    <ImageButton
-        android:id="@+id/mainImageButtonWalking"
-        android:layout_width="100dp"
-        android:layout_height="90dp"
-        android:layout_marginTop="232dp"
-        android:layout_marginBottom="294dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/mainImageButtonBicycle"
-        app:layout_constraintTop_toBottomOf="@+id/mainTextViewTitle"
-        app:srcCompat="@drawable/walking_icon"
-        android:contentDescription="TODO" />
+        <ImageButton
+            android:id="@+id/mainImageButtonCar"
+            android:layout_width="60dp"
+            android:layout_height="50dp"
+            app:srcCompat="@drawable/ic_action_name" />
+        <ImageButton
+            android:id="@+id/mainImageButtonBicycle"
+            android:layout_width="60dp"
+            android:layout_height="50dp"
+            app:srcCompat="@drawable/bicycle_icon" />
+        <ImageButton
+            android:id="@+id/mainImageButtonWalking"
+            android:layout_width="60dp"
+            android:layout_height="50dp"
+            app:srcCompat="@drawable/walking_icon" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

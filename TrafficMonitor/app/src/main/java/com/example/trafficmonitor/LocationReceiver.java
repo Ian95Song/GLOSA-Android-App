@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.google.android.gms.location.LocationResult;
 
-public class LocationService extends BroadcastReceiver {
+public class LocationReceiver extends BroadcastReceiver {
     public static final String ACTION_PROCESS_UPDATE = "com.example.trafficmonitor.UPDATE_LOCATION";
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -18,21 +18,16 @@ public class LocationService extends BroadcastReceiver {
                 LocationResult result = LocationResult.extractResult(intent);
                 if (result != null) {
                     Location location = result.getLastLocation();
+                    float speed = location.getSpeed();
                     UTMLocation utmLocation = new UTMLocation();
                     utmLocation.getUTMLocationFromWGS(location.getLatitude(), location.getLongitude());
-                    String locationString = new StringBuilder("" + utmLocation.m_east)
+                    String utmLocationString = new StringBuilder("" + utmLocation.m_east)
                             .append("/")
                             .append(utmLocation.m_north)
                             .append("/")
-                            .append(location.getSpeed())
+                            .append(speed)
                             .toString();
                     try {
-                        if(CarActivity.getInstance() != null){
-                            //CarActivity.getInstance().updateGPSTextView(locationString);
-                            //CarActivity.getInstance().updateUtmLocation(utmLocation);
-                            //CarActivity.getInstance().updateSpeed(location.getSpeed());
-                            //CarActivity.getInstance().updateDistanceToIntersection(utmLocation);
-                        }
                         if(MainActivity.getInstance() != null) {
                             MainActivity.getInstance().updateLocationWGS(location);
                             MainActivity.getInstance().updateDistanceToIntersection(utmLocation);

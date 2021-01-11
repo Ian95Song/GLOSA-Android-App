@@ -30,10 +30,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name=".LocationService" />
-        <activity
-            android:name=".CarActivity"
-            android:parentActivityName=".MainActivity" />
+        <service android:enabled="true"
+            android:name=".ClientService"/>
+        <receiver android:name=".LocationReceiver" />
 
         <meta-data
             android:name="preloaded_fonts"

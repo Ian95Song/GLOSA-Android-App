@@ -1,11 +1,13 @@
 package com.example.trafficmonitor;
 
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.method.HideReturnsTransformationMethod;
@@ -28,26 +30,34 @@ import java.io.InputStreamReader;
 
 
 public class LoginActivity extends AppCompatActivity {
+    public static final String TAG = "LoginActivity";
+    public static final String SERVICE_RECEIVER = "com.example.trafficmonitor.LoginActivity.RECEIVE_SERVICE";
     private EditText _m_eText_username;
     private EditText _m_eText_password;
-    String m_username = null;
-    String m_password = null;
+    private String _m_username = null;
+    private String _m_password = null;
+    private Intent _m_serviceIntent;
+    private ClientReceiver clientReceiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Login");
-
         Button button = findViewById(R.id.loginButton);
         _m_eText_username = findViewById(R.id.loginEditTextUserName);
         _m_eText_password = findViewById(R.id.loginEditTextPassWord);
         _m_eText_password.setTransformationMethod(PasswordTransformationMethod.getInstance());
         CheckBox rememberCheckbox = findViewById(R.id.loginCheckBoxRemember);
         CheckBox showCheckbox = findViewById(R.id.loginCheckBoxShow);
-        readAuthFromLocal();
+
+        _m_serviceIntent = new Intent(this, ClientService.class);
+        clientReceiver = new ClientReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(SERVICE_RECEIVER);
+        registerReceiver(clientReceiver, intentFilter);
 
         showCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -60,47 +70,58 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });
-
         button.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
-                m_username=_m_eText_username.getText().toString();
-                m_password=_m_eText_password.getText().toString();
+                _m_username=_m_eText_username.getText().toString();
+                _m_password=_m_eText_password.getText().toString();
                 if (rememberCheckbox.isChecked()){
-                    writeAuthToLocal(m_username, m_password);
+                    writeAuthToLocal(_m_username, _m_password);
                 }
-                // update Auth
-                Utils.setBasicAuth(m_username, m_password);
-                // check Auth
-                Runnable runnable = new Runnable() {
-                    public void run() {
-                        try {
-                            String mapInfoStr = Utils.getMapInfoJson(getResources().getString(R.string.map_info_url));
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(LoginActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
-                                    Intent homeIntent = new Intent(LoginActivity.this, MainActivity.class);
-                                    startActivity(homeIntent);
-                                    finish();
-                                }
-                            });
-                        } catch (Exception e) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(LoginActivity.this, "Invalid Authorization or Server down", Toast.LENGTH_SHORT).show();
 
-                                }
-                            });
-                        }
-                    }
-                };
-                Thread thread = new Thread(runnable);
-                thread.start();
+                Bundle req = new Bundle();
+                req.putString("task", "verifyAuthenticity");
+                req.putString("value",  _m_username+":"+_m_password);
+                _m_serviceIntent.putExtras(req);
+                startService(_m_serviceIntent);
+
             }
         });
+
+        readAuthFromLocal();
+    }
+
+    @Override
+    public void onDestroy() {
+        unregisterReceiver(clientReceiver);
+        super.onDestroy();
+    }
+    public class ClientReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null) {
+                final String action = intent.getAction();
+                if (SERVICE_RECEIVER.equals(action)) {
+                    Bundle resp = intent.getExtras();
+                    String task = (String) resp.get("task");
+                    String value = (String) resp.get("value");
+                    Log.d(TAG, task+":"+value);
+                    switch (task) {
+                        case "verifyAuthenticityResp":
+                            if(Boolean.valueOf(value)){
+                                Toast.makeText(LoginActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
+                                Intent homeIntent = new Intent(LoginActivity.this, MainActivity.class);
+                                startActivity(homeIntent);
+                                finish();
+                            } else {
+                                Toast.makeText(LoginActivity.this, "Invalid Authorization or Server down", Toast.LENGTH_SHORT).show();
+                            }
+                            break;
+                    }
+                }
+            }
+        }
     }
 
     /*
@@ -109,7 +130,7 @@ public class LoginActivity extends AppCompatActivity {
      * Description: try to read authorization information from local,
      *              and if get it, update Edit Text and variables in background
      */
-    public void readAuthFromLocal(){
+    private void readAuthFromLocal(){
         // read file
         File file = new File(getFilesDir(),"Authorization.txt");
         if(file.exists()){
@@ -128,8 +149,6 @@ public class LoginActivity extends AppCompatActivity {
             String [] up= str.split("##");
             _m_eText_username.setText(up[0]);
             _m_eText_password.setText(up[1]);
-            // update Auth
-            Utils.setBasicAuth(up[0], up[1]);
         }
     }
 
@@ -138,7 +157,7 @@ public class LoginActivity extends AppCompatActivity {
      * Return: none
      * Description: write authorization information to local
      */
-    public void writeAuthToLocal(String username, String password){
+    private void writeAuthToLocal(String username, String password){
         // write file
         File file = new File(getFilesDir(),"Authorization.txt");
         //Log.i("Auth",file.getAbsolutePath());

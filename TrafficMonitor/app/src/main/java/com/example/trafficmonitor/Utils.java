@@ -1,5 +1,7 @@
 package com.example.trafficmonitor;
 import android.os.Build;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
@@ -46,15 +48,27 @@ public class Utils {
     }
 
     /*
-     * Input: String path of json file
-     * Return: JSONfromKML object of lane
+     * Input: json String
+     * Return: LanesKML object of lanes
      * Description:
      */
-    protected static JSONfromKML laneParser(String jsonString) {
+    protected static LanesKML lanesParser(String jsonString) {
         Gson gson = new Gson();
-        Type laneType = new TypeToken<JSONfromKML>(){}.getType();
-        JSONfromKML lane = gson.fromJson(jsonString, laneType);
-        return lane;
+        Type laneType = new TypeToken<LanesKML>(){}.getType();
+        LanesKML lanes = gson.fromJson(jsonString, laneType);
+        return lanes;
+    }
+
+    /*
+     * Input: json String
+     * Return: ConnectionsKML object of connections
+     * Description:
+     */
+    protected static ConnectionsKML connectionsParser(String jsonString) {
+        Gson gson = new Gson();
+        Type connectionType = new TypeToken<ConnectionsKML>(){}.getType();
+        ConnectionsKML connections = gson.fromJson(jsonString, connectionType);
+        return connections;
     }
 
     /*
@@ -131,4 +145,81 @@ public class Utils {
         }
         return addedPointsLocations;
     }
+
+    /*
+     * Input: list of location in the past time
+     * Return: corresponding signal group
+     * Description: do determination job with linear regression
+     */
+    protected static void doDeterminationLinearRegression(List<UTMLocation> locationList, boolean determinated, List<Lane> trafficLights){
+        determinated = true;
+        double alpha = Utils.getLinearRegressionAlpha(locationList);
+        double beta = Utils.getLinearRegressionBeta(locationList, alpha);
+        Log.i("Determination","Linear Regression Alpha Beta: "+alpha+","+beta);
+        int laneId = 0;
+        int signalGroupId = 0;
+        double deltaABS = Double.POSITIVE_INFINITY;
+        for (Lane trafficLight : trafficLights){
+            if(trafficLight.id == 1 || trafficLight.id == 2 || trafficLight.id == 3 || trafficLight.id == 100){
+                double X = trafficLight.positionUTM.east;
+                double Y = trafficLight.positionUTM.east;
+                double delta = Y - (alpha * X + beta);
+                if(Math.abs(delta) < deltaABS){
+                    deltaABS = Math.abs(delta);
+                    laneId = trafficLight.id;
+                    signalGroupId = trafficLight.signalGroup;
+                }
+                Log.i("Determination","Result lane ID: "+trafficLight.id+", signal group ID:"+trafficLight.signalGroup+"delta: "+delta);
+
+            }
+        }
+    }
+
+    /*
+     * Input: list of location in the past time
+     * Return: corresponding signal group
+     * Description: do determination job with distance between user location and lane points
+     */
+    protected static void doDeterminationDistanceToLane(UTMLocation currentLocation, boolean determinated, LanesKML lanes, String mode_selected){
+        determinated = true;
+        int determinatedLaneId = 0;
+        double determinatedDistance = Double.POSITIVE_INFINITY;
+        for(LanesFeature feature : lanes.features){
+            int laneId = feature.properties.laneId;
+            String laneType = feature.properties.laneType;
+            double minDistance = Double.POSITIVE_INFINITY;
+            if(laneType.equals(mode_selected)){
+                for(UTMLocation location : Utils.addPointsToLanes(feature.geometry.coordinates)){
+                    double distance = Utils.getUTMDistance(currentLocation, location);
+                    if(distance < minDistance){
+                        minDistance = distance;
+                    }
+                }
+                if(minDistance < determinatedDistance){
+                    determinatedDistance = minDistance;
+                    determinatedLaneId = laneId;
+                }
+            }
+        }
+        int determinatedSignalGroupId = getSignalGroupOfLane(determinatedLaneId);
+        String determinationResult = "Lane: " + determinatedLaneId + " Signal Group: " +determinatedSignalGroupId;
+        //Toast.makeText(MainActivity.this, determinationResult, Toast.LENGTH_SHORT).show();
+        Log.i("Determination", "Result lane ID: "+determinatedLaneId+" min distance: "+determinatedDistance+" m");
+    }
+
+    /*
+     * Input: integer of lane id
+     * Return: integer of signal group id
+     * Description: get corresponding signal group of one lane
+     */
+    protected static Integer getSignalGroupOfLane(int laneId){
+        int signalGroupId = 0;
+        //for(Lane lane : trafficLights){
+        //    if(lane.id == laneId){
+        //        signalGroupId = lane.signalGroup;
+        //    }
+        //}
+        return signalGroupId;
+    }
+
 }

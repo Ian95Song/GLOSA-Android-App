@@ -1,0 +1,915 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3274626860513,
+            52.564114738798
+          ],
+          [
+            13.3275604783393,
+            52.5639385619124
+          ]
+        ]
+      },
+      "properties": {
+        "name": "1: 1 --> 22",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "1",
+        "toLane": "22",
+        "signalGroup": "1",
+        "maneuver": "maneuverRightAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3274626860513,
+            52.564114738798
+          ],
+          [
+            13.3281485635815,
+            52.5638670654507
+          ]
+        ]
+      },
+      "properties": {
+        "name": "4: 1 --> 17",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "1",
+        "toLane": "17",
+        "signalGroup": "1",
+        "maneuver": "maneuverStraightAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3274626860513,
+            52.564114738798
+          ],
+          [
+            13.3275982045624,
+            52.5639241728289
+          ]
+        ]
+      },
+      "properties": {
+        "name": "5: 1 --> 21",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "1",
+        "toLane": "21",
+        "signalGroup": "1",
+        "maneuver": "maneuverRightAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3275048506536,
+            52.5641554781702
+          ],
+          [
+            13.3281689801258,
+            52.5642115055598
+          ]
+        ]
+      },
+      "properties": {
+        "name": "2: 3 --> 11",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "3",
+        "toLane": "11",
+        "signalGroup": "1",
+        "maneuver": "maneuverLeftAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3275048506536,
+            52.5641554781702
+          ],
+          [
+            13.3281308100647,
+            52.5642175311351
+          ]
+        ]
+      },
+      "properties": {
+        "name": "6: 3 --> 10",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "3",
+        "toLane": "10",
+        "signalGroup": "1",
+        "maneuver": "maneuverLeftAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3274839902714,
+            52.5641360527742
+          ],
+          [
+            13.3281769692083,
+            52.5638877497549
+          ]
+        ]
+      },
+      "properties": {
+        "name": "3: 2 --> 16",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "2",
+        "toLane": "16",
+        "signalGroup": "1",
+        "maneuver": "maneuverStraightAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3283403015623,
+            52.5640321801393
+          ],
+          [
+            13.3275129876821,
+            52.5639545697416
+          ]
+        ]
+      },
+      "properties": {
+        "name": "104107: 104 --> 107",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "104",
+        "toLane": "107",
+        "signalGroup": "10",
+        "maneuver": "maneuverLeftAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3283403015623,
+            52.5640321801393
+          ],
+          [
+            13.3275915469936,
+            52.5642623177426
+          ]
+        ]
+      },
+      "properties": {
+        "name": "104101: 104 --> 101",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "104",
+        "toLane": "101",
+        "signalGroup": "10",
+        "maneuver": "maneuverStraightAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3278708689904,
+            52.5638074409773
+          ],
+          [
+            13.3282198735404,
+            52.5642097966689
+          ]
+        ]
+      },
+      "properties": {
+        "name": "106103: 106 --> 103",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "106",
+        "toLane": "103",
+        "signalGroup": "11",
+        "maneuver": "maneuverStraightAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3278708689904,
+            52.5638074409773
+          ],
+          [
+            13.328124152496,
+            52.5638431435703
+          ]
+        ]
+      },
+      "properties": {
+        "name": "106105: 106 --> 105",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "106",
+        "toLane": "105",
+        "signalGroup": "11",
+        "maneuver": "maneuverRightAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3278708689904,
+            52.5638074409773
+          ],
+          [
+            13.3275915469936,
+            52.5642623177426
+          ]
+        ]
+      },
+      "properties": {
+        "name": "106101: 106 --> 101",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "106",
+        "toLane": "101",
+        "signalGroup": "11",
+        "maneuver": "maneuverLeftAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3279730996577,
+            52.5642997294978
+          ],
+          [
+            13.3275982045624,
+            52.5639241728289
+          ]
+        ]
+      },
+      "properties": {
+        "name": "7: 7 --> 21",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "7",
+        "toLane": "21",
+        "signalGroup": "2",
+        "maneuver": "maneuverStraightAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3279241295407,
+            52.5643151079689
+          ],
+          [
+            13.3275604783393,
+            52.5639385619124
+          ]
+        ]
+      },
+      "properties": {
+        "name": "8: 6 --> 22",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "6",
+        "toLane": "22",
+        "signalGroup": "2",
+        "maneuver": "maneuverStraightAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3279241295407,
+            52.5643151079689
+          ],
+          [
+            13.3275615139612,
+            52.5642297622502
+          ]
+        ]
+      },
+      "properties": {
+        "name": "9: 6 --> 5",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "6",
+        "toLane": "5",
+        "signalGroup": "2",
+        "maneuver": "maneuverRightAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3279241295407,
+            52.5643151079689
+          ],
+          [
+            13.3275400617951,
+            52.5642021530364
+          ]
+        ]
+      },
+      "properties": {
+        "name": "10: 6 --> 4",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "6",
+        "toLane": "4",
+        "signalGroup": "2",
+        "maneuver": "maneuverRightAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3279871545251,
+            52.5642665445063
+          ],
+          [
+            13.3281485635815,
+            52.5638670654507
+          ]
+        ]
+      },
+      "properties": {
+        "name": "11: 8 --> 17",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "8",
+        "toLane": "17",
+        "signalGroup": "3",
+        "maneuver": "maneuverLeftAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3280201464771,
+            52.5642518855006
+          ],
+          [
+            13.3281769692083,
+            52.5638877497549
+          ]
+        ]
+      },
+      "properties": {
+        "name": "12: 9 --> 16",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "9",
+        "toLane": "16",
+        "signalGroup": "3",
+        "maneuver": "maneuverLeftAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3283173699365,
+            52.5640102367992
+          ],
+          [
+            13.3281689801258,
+            52.5642115055598
+          ]
+        ]
+      },
+      "properties": {
+        "name": "13: 12 --> 11",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "12",
+        "toLane": "11",
+        "signalGroup": "4",
+        "maneuver": "maneuverRightAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3282913314453,
+            52.5639901820435
+          ],
+          [
+            13.3275615139612,
+            52.5642297622502
+          ]
+        ]
+      },
+      "properties": {
+        "name": "14: 13 --> 5",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "13",
+        "toLane": "5",
+        "signalGroup": "5",
+        "maneuver": "maneuverStraightAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3282701751712,
+            52.5639658105181
+          ],
+          [
+            13.3275400617951,
+            52.5642021530364
+          ]
+        ]
+      },
+      "properties": {
+        "name": "15: 14 --> 4",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "14",
+        "toLane": "4",
+        "signalGroup": "5",
+        "maneuver": "maneuverStraightAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3282414736525,
+            52.5639348739711
+          ],
+          [
+            13.3275982045624,
+            52.5639241728289
+          ]
+        ]
+      },
+      "properties": {
+        "name": "16: 15 --> 21",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "15",
+        "toLane": "21",
+        "signalGroup": "5",
+        "maneuver": "maneuverLeftAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3282414736525,
+            52.5639348739711
+          ],
+          [
+            13.3275604783393,
+            52.5639385619124
+          ]
+        ]
+      },
+      "properties": {
+        "name": "17: 15 --> 22",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "15",
+        "toLane": "22",
+        "signalGroup": "5",
+        "maneuver": "maneuverLeftAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3277723369725,
+            52.5638513279104
+          ],
+          [
+            13.3275400617951,
+            52.5642021530364
+          ]
+        ]
+      },
+      "properties": {
+        "name": "18: 20 --> 4",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "20",
+        "toLane": "4",
+        "signalGroup": "6",
+        "maneuver": "maneuverLeftAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3277723369725,
+            52.5638513279104
+          ],
+          [
+            13.3275615139612,
+            52.5642297622502
+          ]
+        ]
+      },
+      "properties": {
+        "name": "19: 20 --> 5",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "20",
+        "toLane": "5",
+        "signalGroup": "6",
+        "maneuver": "maneuverLeftAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.327791274057,
+            52.5638425145576
+          ],
+          [
+            13.3281308100647,
+            52.5642175311351
+          ]
+        ]
+      },
+      "properties": {
+        "name": "20: 19 --> 10",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "19",
+        "toLane": "10",
+        "signalGroup": "6",
+        "maneuver": "maneuverStraightAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3278273728744,
+            52.5638303737055
+          ],
+          [
+            13.3281689801258,
+            52.5642115055598
+          ]
+        ]
+      },
+      "properties": {
+        "name": "21: 18 --> 11",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "18",
+        "toLane": "11",
+        "signalGroup": "6",
+        "maneuver": "maneuverStraightAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3278273728744,
+            52.5638303737055
+          ],
+          [
+            13.3281485635815,
+            52.5638670654507
+          ]
+        ]
+      },
+      "properties": {
+        "name": "22: 18 --> 17",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "18",
+        "toLane": "17",
+        "signalGroup": "6",
+        "maneuver": "maneuverRightAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3278273728744,
+            52.5638303737055
+          ],
+          [
+            13.3281769692083,
+            52.5638877497549
+          ]
+        ]
+      },
+      "properties": {
+        "name": "23: 18 --> 16",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "18",
+        "toLane": "16",
+        "signalGroup": "6",
+        "maneuver": "maneuverRightAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3274342804245,
+            52.5640847013782
+          ],
+          [
+            13.3282198735404,
+            52.5642097966689
+          ]
+        ]
+      },
+      "properties": {
+        "name": "100103: 100 --> 103",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "100",
+        "toLane": "103",
+        "signalGroup": "7",
+        "maneuver": "maneuverLeftAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3274342804245,
+            52.5640847013782
+          ],
+          [
+            13.328124152496,
+            52.5638431435703
+          ]
+        ]
+      },
+      "properties": {
+        "name": "100105: 100 --> 105",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "100",
+        "toLane": "105",
+        "signalGroup": "7",
+        "maneuver": "maneuverStraightAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3274342804245,
+            52.5640847013782
+          ],
+          [
+            13.3275129876821,
+            52.5639545697416
+          ]
+        ]
+      },
+      "properties": {
+        "name": "100107: 100 --> 107",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "100",
+        "toLane": "107",
+        "signalGroup": "7",
+        "maneuver": "maneuverRightAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3278764909374,
+            52.5643238314388
+          ],
+          [
+            13.3275915469936,
+            52.5642623177426
+          ]
+        ]
+      },
+      "properties": {
+        "name": "102101: 102 --> 101",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "102",
+        "toLane": "101",
+        "signalGroup": "8",
+        "maneuver": "maneuverRightAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3278764909374,
+            52.5643238314388
+          ],
+          [
+            13.328124152496,
+            52.5638431435703
+          ]
+        ]
+      },
+      "properties": {
+        "name": "102105: 102 --> 105",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "102",
+        "toLane": "105",
+        "signalGroup": "8",
+        "maneuver": "maneuverLeftAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3278764909374,
+            52.5643238314388
+          ],
+          [
+            13.3275129876821,
+            52.5639545697416
+          ]
+        ]
+      },
+      "properties": {
+        "name": "102107: 102 --> 107",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "102",
+        "toLane": "107",
+        "signalGroup": "8",
+        "maneuver": "maneuverStraightAllowed"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            13.3283403015623,
+            52.5640321801393
+          ],
+          [
+            13.3282198735404,
+            52.5642097966689
+          ]
+        ]
+      },
+      "properties": {
+        "name": "104103: 104 --> 103",
+        "stroke": "#ff0000",
+        "stroke-opacity": 1,
+        "fill-opacity": 0,
+        "fromLane": "104",
+        "toLane": "103",
+        "signalGroup": "9",
+        "maneuver": "maneuverRightAllowed"
+      }
+    }
+  ]
+}

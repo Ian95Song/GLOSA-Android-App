@@ -88,6 +88,15 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });
+        Bundle reqLanes = new Bundle();
+        reqLanes.putString("task", "getLanesJson");
+        _m_serviceIntent.putExtras(reqLanes);
+        startService(_m_serviceIntent);
+
+        Bundle reqConnections = new Bundle();
+        reqConnections.putString("task", "getConnectionsJson");
+        _m_serviceIntent.putExtras(reqConnections);
+        startService(_m_serviceIntent);
 
         readAuthFromLocal();
     }
@@ -108,6 +117,22 @@ public class LoginActivity extends AppCompatActivity {
                     String value = (String) resp.get("value");
                     Log.d(TAG, task+":"+value);
                     switch (task) {
+                        case "getLanesJsonResp":
+                            if(Boolean.valueOf(value)){
+                                Toast.makeText(LoginActivity.this, "Loading Lanes JSON Successfully", Toast.LENGTH_SHORT).show();
+
+                            } else {
+                                Toast.makeText(LoginActivity.this, "Loading Lanes JSON Failed", Toast.LENGTH_SHORT).show();
+                            }
+                            break;
+                        case "getConnectionsJsonResp":
+                            if(Boolean.valueOf(value)){
+                                Toast.makeText(LoginActivity.this, "Loading Connections JSON Successfully", Toast.LENGTH_SHORT).show();
+
+                            } else {
+                                Toast.makeText(LoginActivity.this, "Loading Connections JSON Failed", Toast.LENGTH_SHORT).show();
+                            }
+                            break;
                         case "verifyAuthenticityResp":
                             if(Boolean.valueOf(value)){
                                 Toast.makeText(LoginActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
@@ -115,7 +140,7 @@ public class LoginActivity extends AppCompatActivity {
                                 startActivity(homeIntent);
                                 finish();
                             } else {
-                                Toast.makeText(LoginActivity.this, "Invalid Authorization or Server down", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(LoginActivity.this, "Invalid Authorization or Server Down", Toast.LENGTH_SHORT).show();
                             }
                             break;
                     }

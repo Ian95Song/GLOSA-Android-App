@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private int[] _m_imageButton_id = {R.id.mainImageButtonCar, R.id.mainImageButtonBicycle, R.id.mainImageButtonWalking};
     private String[] _m_modes = {"vehicle", "bikeLane", "bikeLane"};
     private String _m_mode_selected;
-    private JSONfromKML _m_lanes;
+    private LanesKML _m_lanes;
     private GoogleMap _m_gMap;
     private List<Lane> _m_trafficLights;
     private Location _m_location;
@@ -150,17 +150,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 public void onClick(View v) {
                     switch (v.getId()){
                         case R.id.mainImageButtonCar :
-                            setFocus(_m_imageButton_unfocus, _m_imageButtons[0]);
+                            setModeFocus(_m_imageButton_unfocus, _m_imageButtons[0]);
                             _m_mode_selected = _m_modes[0];
                             break;
 
                         case R.id.mainImageButtonBicycle :
-                            setFocus(_m_imageButton_unfocus, _m_imageButtons[1]);
+                            setModeFocus(_m_imageButton_unfocus, _m_imageButtons[1]);
                             _m_mode_selected = _m_modes[1];
                             break;
 
                         case R.id.mainImageButtonWalking :
-                            setFocus(_m_imageButton_unfocus, _m_imageButtons[2]);
+                            setModeFocus(_m_imageButton_unfocus, _m_imageButtons[2]);
                             _m_mode_selected = _m_modes[2];
                             break;
                     }
@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         // init car imageButton selected
         _m_imageButton_unfocus = _m_imageButtons[0];
-        setFocus(_m_imageButton_unfocus, _m_imageButtons[1]);
+        setModeFocus(_m_imageButton_unfocus, _m_imageButtons[1]);
         _m_mode_selected = _m_modes[1];
 
         _s_instance = this;
@@ -186,11 +186,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         _m_imageResource_trafficLights.put("DARK", R.drawable.dark);
         _m_currentState_trafficLights = new ArrayList<>();
 
-
-
         // map, spat info
         updateSpat();
-        getLanesInfo();
     }
 
     @Override
@@ -284,54 +281,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      * Return: none
      * Description: set focused button in button group of mode
      */
-    private void setFocus(ImageButton btn_unfocus, ImageButton btn_focus){
+    private void setModeFocus(ImageButton btn_unfocus, ImageButton btn_focus){
         btn_unfocus.setBackgroundColor(Color.rgb(232, 232, 232));
         btn_focus.setBackgroundColor(Color.rgb(181, 181, 181));
         _m_imageButton_unfocus = btn_focus;
     }
 
-
-    /*
-     * Input: none
-     * Return: none
-     * Description: get lanes info from assets json file and parse it into object
-     */
-    public void getLanesInfo(){
-        Runnable runnable = new Runnable() {
-            public void run() {
-                try {
-                    InputStream inputStream = getAssets().open("14052_lanes.json");
-                    InputStreamReader isReader = new InputStreamReader(inputStream);
-                    BufferedReader reader = new BufferedReader(isReader);
-                    StringBuffer sb = new StringBuffer();
-                    String str;
-                    while((str = reader.readLine())!= null){
-                        sb.append(str);
-                    }
-                    _m_lanes = Utils.laneParser(sb.toString());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        Thread thread = new Thread(runnable);
-        thread.start();
-    }
-
-    /*
-     * Input: integer of lane id
-     * Return: integer of signal group id
-     * Description: get corresponding signal group of one lane
-     */
-    public Integer getSignalGroupOfLane(int laneId){
-        int signalGroupId = 0;
-        for(Lane lane : _m_trafficLights){
-            if(lane.id == laneId){
-                signalGroupId = lane.signalGroup;
-            }
-        }
-        return signalGroupId;
-    }
 
     /*
      * Input: Location object from LocationService
@@ -381,7 +336,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if((int)distance >= 30  && (int)distance < 70){
                     _m_locationList.add(currentLocation);
                 } else if ((int)distance < 30){
-                    doDetermination(currentLocation);
+                    //Utils.doDetermination(currentLocation);
                 }
             } else {
                 if ((int)distance > 30){
@@ -389,68 +344,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         }
-    }
-
-    /*
-     * Input: list of location in the past time
-     * Return: corresponding signal group
-     * Description: do determination job with linear regression
-     */
-    public void doDeterminationLinearRegression(){
-        _m_determinated = true;
-        double alpha = Utils.getLinearRegressionAlpha(_m_locationList);
-        double beta = Utils.getLinearRegressionBeta(_m_locationList, alpha);
-        Log.i("Determination","Linear Regression Alpha Beta: "+alpha+","+beta);
-        int laneId = 0;
-        int signalGroupId = 0;
-        double deltaABS = Double.POSITIVE_INFINITY;
-        for (Lane trafficLight : _m_trafficLights){
-            if(trafficLight.id == 1 || trafficLight.id == 2 || trafficLight.id == 3 || trafficLight.id == 100){
-                double X = trafficLight.positionUTM.east;
-                double Y = trafficLight.positionUTM.east;
-                double delta = Y - (alpha * X + beta);
-                if(Math.abs(delta) < deltaABS){
-                    deltaABS = Math.abs(delta);
-                    laneId = trafficLight.id;
-                    signalGroupId = trafficLight.signalGroup;
-                }
-                Log.i("Determination","Result lane ID: "+trafficLight.id+", signal group ID:"+trafficLight.signalGroup+"delta: "+delta);
-
-            }
-        }
-    }
-
-    /*
-     * Input: list of location in the past time
-     * Return: corresponding signal group
-     * Description: do determination job with distance between user location and lane points
-     */
-    public void doDetermination(UTMLocation currentLocation){
-        _m_determinated = true;
-        int determinatedLaneId = 0;
-        double determinatedDistance = Double.POSITIVE_INFINITY;
-        for( Feature feature : _m_lanes.features){
-            int laneId = feature.properties.laneId;
-            String laneType = feature.properties.laneType;
-            double minDistance = Double.POSITIVE_INFINITY;
-            if(laneType.equals(_m_mode_selected)){
-                for(UTMLocation location : Utils.addPointsToLanes(feature.geometry.coordinates)){
-                    double distance = Utils.getUTMDistance(currentLocation, location);
-                    if(distance < minDistance){
-                        minDistance = distance;
-                    }
-                }
-
-                if(minDistance < determinatedDistance){
-                    determinatedDistance = minDistance;
-                    determinatedLaneId = laneId;
-                }
-            }
-        }
-        int determinatedSignalGroupId = getSignalGroupOfLane(determinatedLaneId);
-        String determinationResult = "Lane: " + determinatedLaneId + " Signal Group: " +determinatedSignalGroupId;
-        Toast.makeText(MainActivity.this, determinationResult, Toast.LENGTH_SHORT).show();
-        //Log.i("Determination", "Result lane ID: "+determinatedLaneId+" min distance: "+determinatedDistance+" m");
     }
 
     /*

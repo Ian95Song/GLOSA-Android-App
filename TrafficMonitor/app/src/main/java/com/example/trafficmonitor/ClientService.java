@@ -26,6 +26,8 @@ public class ClientService extends Service {
     private String _m_basicAuth = "username:password";
     private String _m_mapInfoJson;
     private String _m_spatJson;
+    private String _m_lanesJson;
+    private String _m_connectionsJson;
 
     @Override
     public void onCreate() {
@@ -56,6 +58,7 @@ public class ClientService extends Service {
                                 _m_mapInfoJson = getMapInfoJson(getResources().getString(R.string.map_info_url));
                                 resp.putString("value", "true");
                             } catch (Exception e) {
+                                e.printStackTrace();
                                 resp.putString("value", "false");
                             } finally {
                                 respIntent.putExtras(resp);
@@ -78,6 +81,7 @@ public class ClientService extends Service {
                                 _m_spatJson = getSpatJson(getResources().getString(R.string.spat_url));
                                 resp.putString("value", "true");
                             } catch (Exception e) {
+                                e.printStackTrace();
                                 resp.putString("value", "false");
                             } finally {
                                 respIntent.putExtras(resp);
@@ -85,6 +89,50 @@ public class ClientService extends Service {
                             }
                         }
                     }
+                ).start();
+                break;
+            case "getLanesJson":
+                new Thread(
+                    new Runnable() {
+                        public void run() {
+                            Intent respIntent = new Intent(LoginActivity.SERVICE_RECEIVER);
+                            Bundle resp = new Bundle();
+                            resp.putString("task", "getLanesJsonResp");
+                            try {
+                                _m_lanesJson = getLanesJson();
+                                //_m_lanes = Utils.laneParser(sb.toString());
+                                resp.putString("value", "true");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                resp.putString("value", "false");
+                            } finally {
+                                respIntent.putExtras(resp);
+                                getApplicationContext().sendBroadcast(respIntent);
+                            }
+                        }
+                    }
+                ).start();
+                break;
+            case "getConnectionsJson":
+                new Thread(
+                        new Runnable() {
+                            public void run() {
+                                Intent respIntent = new Intent(LoginActivity.SERVICE_RECEIVER);
+                                Bundle resp = new Bundle();
+                                resp.putString("task", "getConnectionsJsonResp");
+                                try {
+                                    _m_connectionsJson = getConnectionsJson();
+                                    //_m_connectionsJson = Utils.connectionsParser(sb.toString());
+                                    resp.putString("value", "true");
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                    resp.putString("value", "false");
+                                } finally {
+                                    respIntent.putExtras(resp);
+                                    getApplicationContext().sendBroadcast(respIntent);
+                                }
+                            }
+                        }
                 ).start();
                 break;
         }
@@ -174,6 +222,40 @@ public class ClientService extends Service {
         }
         rd.close();
         is.close();
+        return sb.toString();
+    }
+
+    /*
+     * Input: none
+     * Return: json String of lanes information
+     * Description: get lanes json
+     */
+    private String getLanesJson() throws IOException {
+        InputStream inputStream = getAssets().open("14052_lanes.json");
+        InputStreamReader isReader = new InputStreamReader(inputStream);
+        BufferedReader reader = new BufferedReader(isReader);
+        StringBuffer sb = new StringBuffer();
+        String str;
+        while((str = reader.readLine())!= null){
+            sb.append(str);
+        }
+        return sb.toString();
+    }
+
+    /*
+     * Input: none
+     * Return: json String of connections information
+     * Description: get connections json
+     */
+    private String getConnectionsJson() throws IOException {
+        InputStream inputStream = getAssets().open("14052_connections.json");
+        InputStreamReader isReader = new InputStreamReader(inputStream);
+        BufferedReader reader = new BufferedReader(isReader);
+        StringBuffer sb = new StringBuffer();
+        String str;
+        while((str = reader.readLine())!= null){
+            sb.append(str);
+        }
         return sb.toString();
     }
 }

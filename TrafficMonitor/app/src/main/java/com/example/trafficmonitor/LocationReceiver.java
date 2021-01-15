@@ -18,22 +18,8 @@ public class LocationReceiver extends BroadcastReceiver {
                 LocationResult result = LocationResult.extractResult(intent);
                 if (result != null) {
                     Location location = result.getLastLocation();
-                    float speed = location.getSpeed();
-                    UTMLocation utmLocation = new UTMLocation();
-                    utmLocation.getUTMLocationFromWGS(location.getLatitude(), location.getLongitude());
-                    String utmLocationString = new StringBuilder("" + utmLocation.m_east)
-                            .append("/")
-                            .append(utmLocation.m_north)
-                            .append("/")
-                            .append(speed)
-                            .toString();
-                    try {
-                        if(MainActivity.getInstance() != null) {
-                            MainActivity.getInstance().updateLocationWGS(location);
-                            MainActivity.getInstance().updateDistanceToIntersection(utmLocation);
-                        }
-                    } catch (Exception ex) {
-                        Log.e("LocationService",ex.toString());
+                    if(MainActivity.getInstance() != null) {
+                        MainActivity.getInstance().updateLocationWGS(location);
                     }
                 }
             }

@@ -10,9 +10,11 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -21,6 +23,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -66,9 +69,20 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     public static final String TAG = "MainActivity";
-    public static final String SERVICE_RECEIVER = "com.example.trafficmonitor.MainActivity.RECEIVE_SERVICE";
+    public static final String SERVICE_RECEIVER = "com.example.trafficmonitor.RECEIVE_SERVICE";
     private Intent _m_serviceIntent;
-    private MainActivity.ClientReceiver clientReceiver;
+    private MainActivity.ClientReceiver _m_clientReceiver;
+    private ClientService.ClientBinder _m_clientBinder;
+    private ServiceConnection _m_serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            _m_clientBinder = (ClientService.ClientBinder) service;
+        }
+    };
 
     private LocationRequest _m_locationRequest;
     private FusedLocationProviderClient _m_fusedLocationProviderClient;
@@ -76,47 +90,38 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     // Traffic light timer parameters
     HashMap<String, Integer> _m_imageResource_trafficLights;
-    private static Context _s_context;
     private HashMap<String, Integer> _m_idDictionary;
-    private List<String> _m_currentState_trafficLights;
-
-
-    // GPS info parameters
-    private TextView _m_textView_gpsInfo;
-    private UTMLocation _m_current_utm_location;
-    private float _m_current_speed; //in m/s
 
     // map, spat info parameters
-    private int _m_timeLeft_cal_neceSpeed = 25; // second
-    private TextView _m_textView_mapInfo;
     private MapInfo _m_mapInfo;
-    private Spat _m_spat;
     private UTMLocation _m_intersection_location;
+    private Spat _m_spat;
+    private LanesKML _m_lanes;
+    private ConnectionsKML _m_connections;
 
     private ImageButton[] _m_imageButtons = new ImageButton[3];
     private ImageButton _m_imageButton_unfocus;
     private int[] _m_imageButton_id = {R.id.mainImageButtonCar, R.id.mainImageButtonBicycle, R.id.mainImageButtonWalking};
     private String[] _m_modes = {"vehicle", "bikeLane", "bikeLane"};
     private String _m_mode_selected;
-    private LanesKML _m_lanes;
     private GoogleMap _m_gMap;
     private List<Lane> _m_trafficLights;
     private Location _m_location;
-    private List<UTMLocation> _m_locationList;
     private boolean _m_determinated;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         _m_serviceIntent = new Intent(this, ClientService.class);
-        clientReceiver = new MainActivity.ClientReceiver();
+        _m_clientReceiver = new MainActivity.ClientReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(SERVICE_RECEIVER);
-        registerReceiver(clientReceiver, intentFilter);
+        registerReceiver(_m_clientReceiver, intentFilter);
         Bundle req = new Bundle();
-        req.putString("task", "getSpatJson");
+        req.putString("task", ClientService.TASK_REQ_SPAT_JSON);
         _m_serviceIntent.putExtras(req);
         startService(_m_serviceIntent);
+        bindService(_m_serviceIntent, _m_serviceConnection, BIND_AUTO_CREATE);
 
         Dexter.withContext(this)
             .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -173,10 +178,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         _m_mode_selected = _m_modes[1];
 
         _s_instance = this;
-        _m_locationList = new ArrayList<>();
         _m_determinated = false;
-
-        _s_context = this.getApplicationContext();
         _m_idDictionary = new HashMap<>();
         _m_imageResource_trafficLights = new HashMap<>();
         _m_imageResource_trafficLights.put("STOP_AND_REMAIN", R.drawable.red);
@@ -184,7 +186,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         _m_imageResource_trafficLights.put("PROTECTED_MOVEMENT_ALLOWED", R.drawable.green);
         _m_imageResource_trafficLights.put("PROTECTED_CLEARANCE", R.drawable.yellow);
         _m_imageResource_trafficLights.put("DARK", R.drawable.dark);
-        _m_currentState_trafficLights = new ArrayList<>();
 
         // map, spat info
         updateSpat();
@@ -192,8 +193,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onDestroy() {
+        unbindService(_m_serviceConnection);
         stopService(_m_serviceIntent);
-        unregisterReceiver(clientReceiver);
+        unregisterReceiver(_m_clientReceiver);
         super.onDestroy();
     }
 
@@ -208,8 +210,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     String value = (String) resp.get("value");
                     Log.d(TAG, task+":"+value);
                     switch (task) {
-                        case "getSpatJsonResp":
+                        case ClientService.RESP_REQ_SPAT_JSON:
                             if(Boolean.valueOf(value)){
+                                _m_mapInfo = Utils.mapInfoParser(_m_clientBinder.getMapInfoJson());
+                                _m_intersection_location = new UTMLocation(_m_mapInfo.map.intersection.positionUTM.east, _m_mapInfo.map.intersection.positionUTM.north);
+                                _m_spat = Utils.spatParser(_m_clientBinder.getSpatJson());
+                                _m_lanes = Utils.lanesParser(_m_clientBinder.getLanesJson());
+                                _m_connections = Utils.connectionsParser(_m_clientBinder.getConnectionsJson());
+                                findViewById(R.id.mainLoadingPanel).setVisibility(View.GONE);
                                 Toast.makeText(MainActivity.this, "Get Spat Json Successfully", Toast.LENGTH_SHORT).show();
                             } else {
                                 Toast.makeText(MainActivity.this, "Invalid Authorization or Server down", Toast.LENGTH_SHORT).show();
@@ -224,16 +232,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         _m_gMap = googleMap;
-        //LatLng intersection = new LatLng(52.564232999999994, 13.327774999999999);
-        //gMap.addMarker(new MarkerOptions().position(intersection).title("Reference Point of Intersection 14052"));
-        //gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(intersection, 19f));
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         _m_gMap.setMyLocationEnabled(true);
-        MapInfo mapInfo = getMapInfo();
-        if(mapInfo != null){
-            _m_trafficLights =  mapInfo.map.intersection.lanes;
+        if(_m_mapInfo != null){
+            _m_trafficLights =  _m_mapInfo.map.intersection.lanes;
         }
         if(_m_trafficLights != null){
             //showTrafficLights();
@@ -242,10 +246,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public static MainActivity getInstance() {
         return _s_instance;
-    }
-
-    public static Context getContext() {
-        return _s_context;
     }
 
     private void startLocationRequest() {
@@ -296,12 +296,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      *              get street information
      *              add speed information on the map
      *              add travel trajectory on the map
+     *              calculate distance to next intersection
+     *              call determination function when distance is less than threshold
      */
-    public void updateLocationWGS(Location location) throws IOException {
-        LatLng locationCurrent = new LatLng(location.getLatitude(), location.getLongitude());
+    protected void updateLocationWGS(Location location) {
+        UTMLocation currentLocation = new UTMLocation();
+        currentLocation.getUTMLocationFromWGS(location.getLatitude(), location.getLongitude());
+
+        LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
         float speedCurrent = (float) (location.getSpeed() * 3.6); //in km/h
         if(_m_gMap != null) {
-            _m_gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locationCurrent, 19f));
+            _m_gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 19f));
             //add speed information on the current location
 
             //Log.i("Current Speed", String.format("%.1f km/h",speedCurrent));
@@ -310,33 +315,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             //        .title(String.format("%.1f km/h",speedCurrent)));
             //markerCurrent.showInfoWindow();
 
-
             //add red trajectory line on the map
             if (_m_location !=null){
                 Polyline line = _m_gMap.addPolyline(new PolylineOptions()
-                        .add(locationCurrent, new LatLng(_m_location.getLatitude(),_m_location.getLongitude()))
+                        .add(currentLatLng, new LatLng(_m_location.getLatitude(),_m_location.getLongitude()))
                         .width(5)
                         .color(Color.RED));
             }
             _m_location=location;
         }
-    }
-
-    /*
-     * Input: UTMLocation object
-     * Return: none
-     * Description: update distance to intersection called by LocationService,
-     *              call determination function when distance is less than threshold
-     */
-    public void updateDistanceToIntersection(UTMLocation currentLocation){
-        UTMLocation intersectionLocation = getIntersectionUTMLocation();
-        if(intersectionLocation != null){
-            double distance = Utils.getUTMDistance(currentLocation, intersectionLocation);
+        if(_m_intersection_location != null){
+            double distance = Utils.getUTMDistance(currentLocation, _m_intersection_location);
             if(!_m_determinated){
                 if((int)distance >= 30  && (int)distance < 70){
-                    _m_locationList.add(currentLocation);
                 } else if ((int)distance < 30){
-                    //Utils.doDetermination(currentLocation);
+                    determinate(currentLocation);
                 }
             } else {
                 if ((int)distance > 30){
@@ -347,11 +340,45 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     /*
+     * Input: none
+     * Return: corresponding signal group
+     * Description: do determination job
+     */
+    private void determinate(UTMLocation currentLocation){
+        _m_determinated = true;
+        int determinatedLaneId = 0;
+        int determinatedSignalGroupId = 0;
+        double determinatedDistance = Double.POSITIVE_INFINITY;
+        for(ConnectionsFeature connection : _m_connections.features){
+            double longConnectionStart = connection.geometry.coordinates.get(0).get(0);
+            double latConnectionStart = connection.geometry.coordinates.get(0).get(1);
+            UTMLocation connectionStart = new UTMLocation();
+            connectionStart.getUTMLocationFromWGS(latConnectionStart, longConnectionStart);
+
+            String laneType = "";
+            for(LanesFeature lane : _m_lanes.features){
+                if(lane.properties.laneId == Integer.valueOf(connection.properties.fromLane)){
+                    laneType = lane.properties.laneType;
+                }
+            }
+            if(laneType.equals(_m_mode_selected)){
+                double distance = Utils.getUTMDistance(currentLocation, connectionStart);
+                if(distance < determinatedDistance){
+                    determinatedDistance = distance;
+                    determinatedLaneId = Integer.valueOf(connection.properties.fromLane);
+                    determinatedSignalGroupId = Integer.valueOf(connection.properties.signalGroup);
+                }
+            }
+        }
+        Log.d("Determination", "Result lane ID: "+determinatedLaneId+" signal group ID: "+determinatedSignalGroupId);
+    }
+
+    /*
      * Input: list of traffic lights states
      * Return: none
      * Description: show traffic lights with their positions and states at map view
      */
-    public void showTrafficLights(){
+    private void showTrafficLights(){
         MarkerManager markerManager = new MarkerManager(_m_gMap);
         MarkerManager.Collection markerCollection = markerManager.newCollection();
         for(int i = 0; i < _m_trafficLights.size(); i++){
@@ -375,7 +402,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      * Description: get corresponding bitmaps of traffic lights as icon
      */
     @SuppressLint("ResourceType")
-    public Bitmap getTrafficLightBitmap(String state){
+    private Bitmap getTrafficLightBitmap(String state){
         InputStream is;
         switch (state){
             default:
@@ -487,60 +514,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
         return state+":"+((long)timeLefts*1000);
-    }
-
-    // GPS info functions
-    /*
-     * Input: none
-     * Return: none
-     * Description: get object of mapInfo
-     */
-    public MapInfo getMapInfo() {
-        return _m_mapInfo;
-    }
-
-    /*
-     * Input: none
-     * Return: none
-     * Description: get object of mapInfo
-     */
-    public UTMLocation getIntersectionUTMLocation() {
-        return _m_intersection_location;
-    }
-
-    // map, spat info functions
-    /*
-     * Input: none
-     * Return: none
-     * Description: get json of mapInfo from server, parse it into object and update MapInfo TextView
-     */
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void updateMapInfoText() {
-        /*
-        Runnable runnable = new Runnable() {
-            public void run() {
-                try {
-                    String mapInfoStr = Utils.getMapInfoJson(getResources().getString(R.string.map_info_url));
-                    _m_mapInfo = Utils.mapInfoParser(mapInfoStr);
-                    int intersectionID = _m_mapInfo.map.intersection.intersectionID;
-                    _m_intersection_location = new UTMLocation(_m_mapInfo.map.intersection.positionUTM.east,_m_mapInfo.map.intersection.positionUTM.north);
-                    //Update view at main thread
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            _m_textView_mapInfo.setText("Intersection ID: " + String.valueOf(intersectionID));
-                        }
-                    });
-                } catch (Exception e) {
-                    Log.w("Client", "Invalid Authorization or Server down. Please check AuthUrlInfo");
-                    e.printStackTrace();
-                }
-            }
-        };
-        Thread thread = new Thread(runnable);
-        thread.start();
-
-         */
     }
 
     /*

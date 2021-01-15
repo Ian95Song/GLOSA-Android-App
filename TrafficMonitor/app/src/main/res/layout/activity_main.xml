@@ -40,4 +40,20 @@
             android:layout_height="50dp"
             app:srcCompat="@drawable/walking_icon" />
     </LinearLayout>
+    <RelativeLayout
+        android:id="@+id/mainLoadingPanel"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center" >
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true" />
+    </RelativeLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

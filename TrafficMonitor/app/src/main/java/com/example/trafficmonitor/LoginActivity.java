@@ -31,13 +31,13 @@ import java.io.InputStreamReader;
 
 public class LoginActivity extends AppCompatActivity {
     public static final String TAG = "LoginActivity";
-    public static final String SERVICE_RECEIVER = "com.example.trafficmonitor.LoginActivity.RECEIVE_SERVICE";
+    public static final String SERVICE_RECEIVER = "com.example.trafficmonitor.RECEIVE_SERVICE";
     private EditText _m_eText_username;
     private EditText _m_eText_password;
     private String _m_username = null;
     private String _m_password = null;
     private Intent _m_serviceIntent;
-    private ClientReceiver clientReceiver;
+    private ClientReceiver _m_clientReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,10 +54,10 @@ public class LoginActivity extends AppCompatActivity {
         CheckBox showCheckbox = findViewById(R.id.loginCheckBoxShow);
 
         _m_serviceIntent = new Intent(this, ClientService.class);
-        clientReceiver = new ClientReceiver();
+        _m_clientReceiver = new ClientReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(SERVICE_RECEIVER);
-        registerReceiver(clientReceiver, intentFilter);
+        registerReceiver(_m_clientReceiver, intentFilter);
 
         showCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -80,22 +80,22 @@ public class LoginActivity extends AppCompatActivity {
                     writeAuthToLocal(_m_username, _m_password);
                 }
 
-                Bundle req = new Bundle();
-                req.putString("task", "verifyAuthenticity");
-                req.putString("value",  _m_username+":"+_m_password);
-                _m_serviceIntent.putExtras(req);
+                Bundle extras = new Bundle();
+                extras.putString("task", ClientService.TASK_VERIFY_AUTH);
+                extras.putString("value",  _m_username+":"+_m_password);
+                _m_serviceIntent.putExtras(extras);
                 startService(_m_serviceIntent);
 
             }
         });
-        Bundle reqLanes = new Bundle();
-        reqLanes.putString("task", "getLanesJson");
-        _m_serviceIntent.putExtras(reqLanes);
+        Bundle extrasLanes = new Bundle();
+        extrasLanes.putString("task", ClientService.TASK_READ_LANES_JSON);
+        _m_serviceIntent.putExtras(extrasLanes);
         startService(_m_serviceIntent);
 
-        Bundle reqConnections = new Bundle();
-        reqConnections.putString("task", "getConnectionsJson");
-        _m_serviceIntent.putExtras(reqConnections);
+        Bundle extrasConnections = new Bundle();
+        extrasConnections.putString("task", ClientService.TASK_READ_CONNECTIONS_JSON);
+        _m_serviceIntent.putExtras(extrasConnections);
         startService(_m_serviceIntent);
 
         readAuthFromLocal();
@@ -103,7 +103,7 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
-        unregisterReceiver(clientReceiver);
+        unregisterReceiver(_m_clientReceiver);
         super.onDestroy();
     }
     public class ClientReceiver extends BroadcastReceiver {
@@ -117,7 +117,7 @@ public class LoginActivity extends AppCompatActivity {
                     String value = (String) resp.get("value");
                     Log.d(TAG, task+":"+value);
                     switch (task) {
-                        case "getLanesJsonResp":
+                        case ClientService.RESP_READ_LANES_JSON:
                             if(Boolean.valueOf(value)){
                                 Toast.makeText(LoginActivity.this, "Loading Lanes JSON Successfully", Toast.LENGTH_SHORT).show();
 
@@ -125,15 +125,14 @@ public class LoginActivity extends AppCompatActivity {
                                 Toast.makeText(LoginActivity.this, "Loading Lanes JSON Failed", Toast.LENGTH_SHORT).show();
                             }
                             break;
-                        case "getConnectionsJsonResp":
+                        case ClientService.RESP_READ_CONNECTIONS_JSON:
                             if(Boolean.valueOf(value)){
                                 Toast.makeText(LoginActivity.this, "Loading Connections JSON Successfully", Toast.LENGTH_SHORT).show();
-
                             } else {
                                 Toast.makeText(LoginActivity.this, "Loading Connections JSON Failed", Toast.LENGTH_SHORT).show();
                             }
                             break;
-                        case "verifyAuthenticityResp":
+                        case ClientService.RESP_VERIFY_AUTH:
                             if(Boolean.valueOf(value)){
                                 Toast.makeText(LoginActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
                                 Intent homeIntent = new Intent(LoginActivity.this, MainActivity.class);

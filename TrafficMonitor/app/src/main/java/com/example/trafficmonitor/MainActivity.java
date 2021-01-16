@@ -25,11 +25,14 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -91,6 +94,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     // Traffic light timer parameters
     HashMap<String, Integer> _m_imageResource_trafficLights;
     private HashMap<String, Integer> _m_idDictionary;
+    private CountDownTimer _m_timer;
+    private boolean _m_timeCleared = false;
+    private long _m_timeLeft = 0;
 
     // map, spat info parameters
     private MapInfo _m_mapInfo;
@@ -98,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Spat _m_spat;
     private LanesKML _m_lanes;
     private ConnectionsKML _m_connections;
-
+    private boolean _m_dataResourceLoaded = false;
     private ImageButton[] _m_imageButtons = new ImageButton[3];
     private ImageButton _m_imageButton_unfocus;
     private int[] _m_imageButton_id = {R.id.mainImageButtonCar, R.id.mainImageButtonBicycle, R.id.mainImageButtonWalking};
@@ -107,7 +113,44 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleMap _m_gMap;
     private List<Lane> _m_trafficLights;
     private Location _m_location;
-    private boolean _m_determinated;
+    private boolean _m_determinated = false;
+
+    public class ClientReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null) {
+                final String action = intent.getAction();
+                if (SERVICE_RECEIVER.equals(action)) {
+                    Bundle resp = intent.getExtras();
+                    String task = (String) resp.get("task");
+                    String value = (String) resp.get("value");
+                    Log.d(TAG, task+":"+value);
+                    switch (task) {
+                        case ClientService.RESP_REQ_SPAT_JSON:
+                            if(Boolean.valueOf(value)){
+                                _m_mapInfo = Utils.mapInfoParser(_m_clientBinder.getMapInfoJson());
+                                _m_intersection_location = new UTMLocation(_m_mapInfo.map.intersection.positionUTM.east, _m_mapInfo.map.intersection.positionUTM.north);
+                                _m_spat = Utils.spatParser(_m_clientBinder.getSpatJson());
+                                _m_lanes = Utils.lanesParser(_m_clientBinder.getLanesJson());
+                                _m_connections = Utils.connectionsParser(_m_clientBinder.getConnectionsJson());
+                                findViewById(R.id.mainLoadingPanel).setVisibility(View.GONE);
+                                _m_dataResourceLoaded = true;
+                                Toast.makeText(MainActivity.this, "Get Spat Json Successfully", Toast.LENGTH_SHORT).show();
+                            } else {
+                                _m_dataResourceLoaded = false;
+                                Toast.makeText(MainActivity.this, "Invalid Authorization or Server down", Toast.LENGTH_SHORT).show();
+                            }
+                            break;
+                    }
+                }
+            }
+        }
+    }
+
+    public static MainActivity getInstance() {
+        return _s_instance;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -177,8 +220,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setModeFocus(_m_imageButton_unfocus, _m_imageButtons[1]);
         _m_mode_selected = _m_modes[1];
 
+        Button buttonClear = findViewById(R.id.mainButtonClear);
+        buttonClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(_m_gMap != null){
+                    _m_gMap.clear();
+                }
+                if(_m_timer != null){
+                    _m_timeCleared = true;
+                    _m_timer.cancel();
+                }
+            }
+        });
+
         _s_instance = this;
-        _m_determinated = false;
         _m_idDictionary = new HashMap<>();
         _m_imageResource_trafficLights = new HashMap<>();
         _m_imageResource_trafficLights.put("STOP_AND_REMAIN", R.drawable.red);
@@ -186,47 +242,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         _m_imageResource_trafficLights.put("PROTECTED_MOVEMENT_ALLOWED", R.drawable.green);
         _m_imageResource_trafficLights.put("PROTECTED_CLEARANCE", R.drawable.yellow);
         _m_imageResource_trafficLights.put("DARK", R.drawable.dark);
-
-        // map, spat info
-        updateSpat();
     }
 
     @Override
-    public void onDestroy() {
+    protected void onDestroy() {
         unbindService(_m_serviceConnection);
         stopService(_m_serviceIntent);
         unregisterReceiver(_m_clientReceiver);
         super.onDestroy();
-    }
-
-    public class ClientReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent != null) {
-                final String action = intent.getAction();
-                if (SERVICE_RECEIVER.equals(action)) {
-                    Bundle resp = intent.getExtras();
-                    String task = (String) resp.get("task");
-                    String value = (String) resp.get("value");
-                    Log.d(TAG, task+":"+value);
-                    switch (task) {
-                        case ClientService.RESP_REQ_SPAT_JSON:
-                            if(Boolean.valueOf(value)){
-                                _m_mapInfo = Utils.mapInfoParser(_m_clientBinder.getMapInfoJson());
-                                _m_intersection_location = new UTMLocation(_m_mapInfo.map.intersection.positionUTM.east, _m_mapInfo.map.intersection.positionUTM.north);
-                                _m_spat = Utils.spatParser(_m_clientBinder.getSpatJson());
-                                _m_lanes = Utils.lanesParser(_m_clientBinder.getLanesJson());
-                                _m_connections = Utils.connectionsParser(_m_clientBinder.getConnectionsJson());
-                                findViewById(R.id.mainLoadingPanel).setVisibility(View.GONE);
-                                Toast.makeText(MainActivity.this, "Get Spat Json Successfully", Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(MainActivity.this, "Invalid Authorization or Server down", Toast.LENGTH_SHORT).show();
-                            }
-                            break;
-                    }
-                }
-            }
-        }
     }
 
     @Override
@@ -236,6 +259,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             return;
         }
         _m_gMap.setMyLocationEnabled(true);
+        View locationButton = ((View) findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+        RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+        // position on right bottom
+        rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+        rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+
+        float dip = 30f;
+        int px = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                dip,
+                getResources().getDisplayMetrics()
+        );
+
+        rlp.setMargins(0, 0, px, px);
         if(_m_mapInfo != null){
             _m_trafficLights =  _m_mapInfo.map.intersection.lanes;
         }
@@ -244,8 +281,60 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    public static MainActivity getInstance() {
-        return _s_instance;
+    /*
+     * Input: Location object from LocationService
+     * Return: none
+     * Description: get current location information from LocationService,
+     *              move camera of map view to current location,
+     *              get street information
+     *              add speed information on the map
+     *              add travel trajectory on the map
+     *              calculate distance to next intersection
+     *              call determination function when distance is less than threshold
+     */
+    protected void updateLocationWGS(Location location) {
+        UTMLocation currentLocation = new UTMLocation();
+        currentLocation.getUTMLocationFromWGS(location.getLatitude(), location.getLongitude());
+
+        LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+        float currentSpeed = (float) (location.getSpeed() * 3.6); //in km/h
+        if(_m_gMap != null) {
+            _m_gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 19f));
+            //add speed information on the current location
+
+            //Log.i("Current Speed", String.format("%.1f km/h",currentSpeed));
+            //Marker markerCurrent = _m_gMap.addMarker(new MarkerOptions()
+            //        .position(locationCurrent).alpha(0.0f)
+            //        .title(String.format("%.1f km/h",currentSpeed)));
+            //markerCurrent.showInfoWindow();
+
+            //add red trajectory line on the map
+            if (_m_location !=null){
+                Polyline line = _m_gMap.addPolyline(new PolylineOptions()
+                        .add(currentLatLng, new LatLng(_m_location.getLatitude(),_m_location.getLongitude()))
+                        .width(5)
+                        .color(Color.RED));
+            }
+            _m_location=location;
+        }
+        if(_m_intersection_location != null){
+            double distance = Utils.getUTMDistance(currentLocation, _m_intersection_location);
+            if(!_m_determinated){
+                if ((int)distance < 50){
+                    if(_m_dataResourceLoaded){
+                        determinate(currentLocation, currentSpeed);
+                    } else {
+                        Toast.makeText(MainActivity.this, "Data resource still not loaded jet", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            } else {
+                if ((int)distance > 50){
+                    _m_determinated = false;
+                    LinearLayout popupGroup = findViewById(R.id.mainPopupGroup);
+                    popupGroup.setVisibility(View.GONE);
+                }
+            }
+        }
     }
 
     private void startLocationRequest() {
@@ -285,92 +374,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         btn_unfocus.setBackgroundColor(Color.rgb(232, 232, 232));
         btn_focus.setBackgroundColor(Color.rgb(181, 181, 181));
         _m_imageButton_unfocus = btn_focus;
-    }
-
-
-    /*
-     * Input: Location object from LocationService
-     * Return: none
-     * Description: get current location information from LocationService,
-     *              move camera of map view to current location,
-     *              get street information
-     *              add speed information on the map
-     *              add travel trajectory on the map
-     *              calculate distance to next intersection
-     *              call determination function when distance is less than threshold
-     */
-    protected void updateLocationWGS(Location location) {
-        UTMLocation currentLocation = new UTMLocation();
-        currentLocation.getUTMLocationFromWGS(location.getLatitude(), location.getLongitude());
-
-        LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-        float speedCurrent = (float) (location.getSpeed() * 3.6); //in km/h
-        if(_m_gMap != null) {
-            _m_gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 19f));
-            //add speed information on the current location
-
-            //Log.i("Current Speed", String.format("%.1f km/h",speedCurrent));
-            //Marker markerCurrent = _m_gMap.addMarker(new MarkerOptions()
-            //        .position(locationCurrent).alpha(0.0f)
-            //        .title(String.format("%.1f km/h",speedCurrent)));
-            //markerCurrent.showInfoWindow();
-
-            //add red trajectory line on the map
-            if (_m_location !=null){
-                Polyline line = _m_gMap.addPolyline(new PolylineOptions()
-                        .add(currentLatLng, new LatLng(_m_location.getLatitude(),_m_location.getLongitude()))
-                        .width(5)
-                        .color(Color.RED));
-            }
-            _m_location=location;
-        }
-        if(_m_intersection_location != null){
-            double distance = Utils.getUTMDistance(currentLocation, _m_intersection_location);
-            if(!_m_determinated){
-                if((int)distance >= 30  && (int)distance < 70){
-                } else if ((int)distance < 30){
-                    determinate(currentLocation);
-                }
-            } else {
-                if ((int)distance > 30){
-                    _m_determinated = false;
-                }
-            }
-        }
-    }
-
-    /*
-     * Input: none
-     * Return: corresponding signal group
-     * Description: do determination job
-     */
-    private void determinate(UTMLocation currentLocation){
-        _m_determinated = true;
-        int determinatedLaneId = 0;
-        int determinatedSignalGroupId = 0;
-        double determinatedDistance = Double.POSITIVE_INFINITY;
-        for(ConnectionsFeature connection : _m_connections.features){
-            double longConnectionStart = connection.geometry.coordinates.get(0).get(0);
-            double latConnectionStart = connection.geometry.coordinates.get(0).get(1);
-            UTMLocation connectionStart = new UTMLocation();
-            connectionStart.getUTMLocationFromWGS(latConnectionStart, longConnectionStart);
-
-            String laneType = "";
-            for(LanesFeature lane : _m_lanes.features){
-                if(lane.properties.laneId == Integer.valueOf(connection.properties.fromLane)){
-                    laneType = lane.properties.laneType;
-                }
-            }
-            if(laneType.equals(_m_mode_selected)){
-                double distance = Utils.getUTMDistance(currentLocation, connectionStart);
-                if(distance < determinatedDistance){
-                    determinatedDistance = distance;
-                    determinatedLaneId = Integer.valueOf(connection.properties.fromLane);
-                    determinatedSignalGroupId = Integer.valueOf(connection.properties.signalGroup);
-                }
-            }
-        }
-        Log.d("Determination", "Result lane ID: "+determinatedLaneId+" signal group ID: "+determinatedSignalGroupId);
     }
 
     /*
@@ -414,7 +417,87 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return Bitmap.createScaledBitmap(bm, bm.getWidth()/2, bm.getHeight()/2,true);
     }
 
-    // Traffic light timer functions
+    /*
+     * Input: none
+     * Return: corresponding signal group
+     * Description: do determination job
+     */
+    private void determinate(UTMLocation currentLocation, float currentSpeed){
+        _m_determinated = true;
+        int determinatedLaneId = 0;
+        int determinatedSignalGroupId = 0;
+        List<String> determinatedManeuvers = new ArrayList();
+        double determinatedDistance = Double.POSITIVE_INFINITY;
+        for(ConnectionsFeature connection : _m_connections.features){
+            double longConnectionStart = connection.geometry.coordinates.get(0).get(0);
+            double latConnectionStart = connection.geometry.coordinates.get(0).get(1);
+            UTMLocation connectionStart = new UTMLocation();
+            connectionStart.getUTMLocationFromWGS(latConnectionStart, longConnectionStart);
+
+            String laneType = "";
+            for(LanesFeature lane : _m_lanes.features){
+                if(lane.properties.laneId == Integer.valueOf(connection.properties.fromLane)){
+                    laneType = lane.properties.laneType;
+                }
+            }
+            if(laneType.equals(_m_mode_selected)){
+                double distance = Utils.getUTMDistance(currentLocation, connectionStart); // meter
+                if(distance < determinatedDistance){
+                    determinatedDistance = distance;
+                    determinatedLaneId = Integer.valueOf(connection.properties.fromLane);
+                    determinatedSignalGroupId = Integer.valueOf(connection.properties.signalGroup);
+                    determinatedManeuvers.add(connection.properties.maneuver);
+                } else if (distance < determinatedDistance){
+                    determinatedManeuvers.add(connection.properties.maneuver);
+                }
+            }
+        }
+        Log.d("Determination", "Result lane ID: "+determinatedLaneId+" signal group ID: "+determinatedSignalGroupId+" maneuvers: "+determinatedManeuvers.size());
+
+        TextView textViewSignalGroup = findViewById(R.id.mainTextViewSignalGroup);
+        textViewSignalGroup.setText("Signal Group: " + determinatedSignalGroupId);
+        String maneuvers = "";
+        for(String maneuver : determinatedManeuvers){
+            switch (maneuver){
+                case "maneuverRightAllowed":
+                    maneuvers += "Right ";
+                    break;
+                case "maneuverStraightAllowed":
+                    maneuvers += "Straight ";
+                    break;
+                case "maneuverLeftAllowed":
+                    maneuvers += "Left ";
+                    break;
+            }
+        }
+        TextView textViewManeuvers = findViewById(R.id.mainTextViewManeuvers);
+        textViewManeuvers.setText(maneuvers);
+
+        generateAdvice(currentSpeed, determinatedDistance, determinatedSignalGroupId);
+        popupResult();
+    }
+
+    /*
+     * Input: none
+     * Return: none
+     * Description: pop up determination and advice result, with traffic light, maneuvers and advice speed
+     */
+    private void popupResult(){
+        LinearLayout popupGroup = findViewById(R.id.mainPopupGroup);
+        popupGroup.setVisibility(View.VISIBLE);
+    }
+
+    /*
+     * Input: none
+     * Return: none
+     * Description: set corresponding traffic light model and generate driving advice
+     */
+    private void generateAdvice(float currentSpeed, double determinatedDistance, int determinatedSignalGroupId){
+        timer(determinatedSignalGroupId);
+        // todo use the time left, when moving is allowed, to calculate necessary speed, compare with current speed
+        
+    }
+
     /*
      * Input: none
      * Return: none
@@ -426,23 +509,33 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         String[] result = calculateCurrentState(signalGroupId).split(":");
         state = result[0];
         timeLeft = Long.valueOf(result[1]);
+        _m_timeLeft = timeLeft;
         //updateTrafficLight
-        ImageView imageView = (ImageView) findViewById(_m_idDictionary.get("trafficLight"+signalGroupId));
+        //ImageView imageView = (ImageView) findViewById(_m_idDictionary.get("trafficLight"+signalGroupId));
+        ImageView imageView = (ImageView) findViewById(R.id.mainImageViewTrafficLight);
         imageView.setImageResource(_m_imageResource_trafficLights.get(state));
-        new CountDownTimer(timeLeft, 1000) {
+        _m_timer = new CountDownTimer(timeLeft, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 //updateCountDownText
                 int seconds = (int) millisUntilFinished / 1000;
                 String timeLeftFormatted = String.format(Locale.getDefault(), "%02d", seconds);
-                TextView textView = (TextView) findViewById(_m_idDictionary.get("timer"+signalGroupId));
-                textView.setText(timeLeftFormatted);
+                //TextView textView = (TextView) findViewById(_m_idDictionary.get("timer"+signalGroupId));
+
+                TextView textViewTimer = (TextView) findViewById(R.id.mainTextViewTimer);
+                textViewTimer.setText(timeLeftFormatted);
             }
             @Override
             public void onFinish() {
-                timer(signalGroupId);
+                if(!_m_timeCleared){
+                    timer(signalGroupId);
+                } else {
+                    Log.d(TAG, "Timer cleared");
+                    _m_timeCleared = false;
+                }
             }
-        }.start();
+        };
+        _m_timer.start();
     }
 
     /*

@@ -102,10 +102,11 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onDestroy() {
+    protected void onDestroy() {
         unregisterReceiver(_m_clientReceiver);
         super.onDestroy();
     }
+
     public class ClientReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {

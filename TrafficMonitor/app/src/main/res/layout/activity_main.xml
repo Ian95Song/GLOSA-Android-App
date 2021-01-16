@@ -18,31 +18,122 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar" />
     <LinearLayout
+        android:id="@+id/mainModeButtonGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+        <ImageButton
+            android:id="@+id/mainImageButtonCar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:srcCompat="@drawable/ic_action_name" />
+        <ImageButton
+            android:id="@+id/mainImageButtonBicycle"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:srcCompat="@drawable/bicycle_icon" />
+        <ImageButton
+            android:id="@+id/mainImageButtonWalking"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:srcCompat="@drawable/walking_icon" />
+        <Button
+            android:id="@+id/mainButtonClear"
+            android:text="Clear"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/mainPopupGroup"
+        android:background="@color/white"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar">
-
-        <ImageButton
-            android:id="@+id/mainImageButtonCar"
-            android:layout_width="60dp"
-            android:layout_height="50dp"
-            app:srcCompat="@drawable/ic_action_name" />
-        <ImageButton
-            android:id="@+id/mainImageButtonBicycle"
-            android:layout_width="60dp"
-            android:layout_height="50dp"
-            app:srcCompat="@drawable/bicycle_icon" />
-        <ImageButton
-            android:id="@+id/mainImageButtonWalking"
-            android:layout_width="60dp"
-            android:layout_height="50dp"
-            app:srcCompat="@drawable/walking_icon" />
+        <ImageView
+            android:id="@+id/mainImageViewTrafficLight"
+            android:layout_width="128dp"
+            android:layout_height="150dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/red" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/mainTextViewSignalGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Signal Group"
+                android:textColor="#000000"
+                android:textSize="14dp"
+                android:textStyle="bold"/>
+            <TextView
+                android:id="@+id/mainTextViewTimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="60"
+                android:textColor="#000000"
+                android:textSize="40dp"
+                android:textStyle="bold"/>
+            <TextView
+                android:id="@+id/mainTextViewManeuvers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:text="Left, Straight, Right"
+                android:textColor="#000000"
+                android:textSize="14dp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/mainTextViewAdvice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Speed Up"
+                android:textColor="#000000"
+                android:textSize="14dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Advice Speed:km/h"
+                android:textColor="#000000"
+                android:textSize="14dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+            <TextView
+                android:id="@+id/mainTextViewAdviceSpeed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="50"
+                android:textColor="#000000"
+                android:textSize="40dp"
+                android:textStyle="bold"/>
+        </LinearLayout>
     </LinearLayout>
     <RelativeLayout
         android:id="@+id/mainLoadingPanel"
         android:layout_width="match_parent"
+        android:visibility="invisible"
         android:layout_height="0dp"
         android:background="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"

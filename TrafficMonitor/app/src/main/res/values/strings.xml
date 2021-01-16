@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">TrafficMonitor</string>
-    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">Enter your key</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyBa98O3XCnL4n1MtOhpU2hYy5uh3TK_tfE</string>
     <string name="spat_url">https://werkzeug.dcaiti.tu-berlin.de/0432l770/trafficlights/spats?intersection=14052@berlin</string>
     <string name="map_info_url">https://werkzeug.dcaiti.tu-berlin.de/0432l770/maps/download?intersection=14052@berlin</string>
 </resources>

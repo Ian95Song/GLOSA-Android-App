@@ -231,6 +231,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     _m_timeCleared = true;
                     _m_timer.cancel();
                 }
+                LinearLayout popupGroup = findViewById(R.id.mainPopupGroup);
+                popupGroup.setVisibility(View.GONE);
             }
         });
 

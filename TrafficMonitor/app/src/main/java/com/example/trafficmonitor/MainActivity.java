@@ -494,8 +494,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      */
     private void generateAdvice(float currentSpeed, double determinatedDistance, int determinatedSignalGroupId){
         timer(determinatedSignalGroupId);
-        // todo use the time left, when moving is allowed, to calculate necessary speed, compare with current speed
-        
+        TextView textViewAdvice = findViewById(R.id.mainTextViewAdvice);
+        TextView textViewAdviceSpeed = findViewById(R.id.mainTextViewAdviceSpeed);
+        // todo use the time left, when moving is allowed, to calculate necessary speed to go through the intersection,
+        //  or the time left, after that the traffic light will change into state green, to calculate necessary speed to wait green light before the intersection
+        //  compare with current speed
+        /*
+        float adviceSpeed = 0f;
+        if(adviceSpeed > 50 || adviceSpeed < 30){
+            textViewAdvice.setText("Stop");
+        } else {
+            if(adviceSpeed < currentSpeed){
+                textViewAdvice.setText("Slow Down");
+            } else if(adviceSpeed > currentSpeed){
+                textViewAdvice.setText("Speed Up");
+            }
+        }
+        textViewAdviceSpeed.setText(String.valueOf(adviceSpeed));
+         */
     }
 
     /*

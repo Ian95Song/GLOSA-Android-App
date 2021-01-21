@@ -97,6 +97,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private CountDownTimer _m_timer;
     private boolean _m_timeCleared = false;
     private long _m_timeLeft = 0;
+    private String _m_current_state;
+    private int _m_current_timeLeft;
 
     // map, spat info parameters
     private MapInfo _m_mapInfo;
@@ -494,6 +496,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      * Return: none
      * Description: set corresponding traffic light model and generate driving advice
      */
+    @SuppressLint("DefaultLocale")
     private void generateAdvice(float currentSpeed, double determinatedDistance, int determinatedSignalGroupId){
         timer(determinatedSignalGroupId);
         TextView textViewAdvice = findViewById(R.id.mainTextViewAdvice);
@@ -501,6 +504,119 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // todo use the time left, when moving is allowed, to calculate necessary speed to go through the intersection,
         //  or the time left, after that the traffic light will change into state green, to calculate necessary speed to wait green light before the intersection
         //  compare with current speed
+
+        //set different upper&lower speed limit
+        double upperLimit = 0.0;
+        double lowerLimit = 0.0;
+        if (_m_mode_selected.equals("vehicle")){
+            upperLimit = 50/3.6; // 50km/h
+            lowerLimit = 30/3.6; // 30 km/h
+        }
+        else if (_m_mode_selected.equals("bikeLane")){
+            upperLimit = 15/3.6; // 15 km/h
+            lowerLimit = 0.0; // 0 km/h
+        }
+
+        //store duration of each state phase
+        HashMap<String,Integer> durationOfEachState= new HashMap<>();
+        String firstState = _m_spat.intersectionStates.get(0).movementStates.get(determinatedSignalGroupId-1).movementEvents.get(0).phaseState;
+        int lastStateLikelyTime = _m_spat.intersectionStates.get(0).movementStates.get(determinatedSignalGroupId-1).movementEvents.get(0).timeChange.likelyTime / 10;
+        for(int j = 1; j < _m_spat.intersectionStates.get(0).movementStates.get(determinatedSignalGroupId-1).movementEvents.size(); j++){
+            MovementEvent movementEvent = _m_spat.intersectionStates.get(0).movementStates.get(determinatedSignalGroupId-1).movementEvents.get(j);
+            int likelyTime = movementEvent.timeChange.likelyTime/10;
+            if(movementEvent.phaseState.equals(firstState)){
+                durationOfEachState.put(movementEvent.phaseState,likelyTime-lastStateLikelyTime);
+                break;
+            }
+            durationOfEachState.put(movementEvent.phaseState,likelyTime-lastStateLikelyTime);
+            lastStateLikelyTime=likelyTime;
+        }
+
+        // Strategies in different situations
+        double adviceSpeed;
+        int timeLeft=0;
+
+        if (currentSpeed>upperLimit){
+            textViewAdvice.setText("Too fast！Slow down!");
+        }else{
+            if (_m_current_state.equals("PROTECTED_MOVEMENT_ALLOWED")){
+                timeLeft = _m_current_timeLeft+durationOfEachState.get("PROTECTED_CLEARANCE");
+                adviceSpeed = determinatedDistance/timeLeft;
+                if(adviceSpeed > upperLimit){
+                    //only a very little time left, not possible to reach
+                    textViewAdvice.setText("Stop! Out of time!");
+                } else if(adviceSpeed > currentSpeed){
+                    //still enough time to reach, but need to speed up
+                    textViewAdvice.setText("Speed Up! GOGOGO!");
+                    textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed*3.6));
+                } else{
+                    //very enough time, and only little distance
+                    textViewAdvice.setText("Keep your speed! Enough time!");
+                }
+
+            } else if (_m_current_state.equals("PROTECTED_CLEARANCE")){
+                timeLeft = _m_current_timeLeft;
+                adviceSpeed = determinatedDistance/timeLeft;
+                if(adviceSpeed > upperLimit){
+                    //only a very little time left, not possible to reach
+                    textViewAdvice.setText("Stop! Out of time!");
+                } else if(adviceSpeed > currentSpeed){
+                    //still enough time to reach, but need to speed up
+                    textViewAdvice.setText("Speed Up!");
+                    textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed*3.6));
+                } else{
+                    //very enough time, and only little distance
+                    textViewAdvice.setText("Keep your speed! Enough time!");
+                }
+
+            } else if (_m_current_state.equals("STOP_AND_REMAIN")){
+                timeLeft=_m_current_timeLeft+durationOfEachState.get("PRE_MOVEMENT");
+                adviceSpeed = determinatedDistance/timeLeft;
+                if(adviceSpeed < lowerLimit){
+                    //still a long time to wait for green light
+                    textViewAdvice.setText("Stop! Still a long time before green!");
+                } else if(adviceSpeed > upperLimit){
+                    //The light will soon be green
+                    textViewAdvice.setText("Speed up! But pay attention to maximum speed!");
+                    textViewAdviceSpeed.setText(String.format("%.2f km/h",upperLimit*3.6));
+                } else{
+                    if(adviceSpeed < currentSpeed){
+                        //still a long time to wait for green light, but not too long
+                        textViewAdvice.setText("Slow down! Still a long time before green!");
+                        textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed*3.6));
+                    } else if(adviceSpeed > currentSpeed){
+                        //The light will soon be green, but no too soon
+                        textViewAdvice.setText("Speed up! Greening light is coming！");
+                        textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed*3.6));
+                    }
+                }
+
+            } else if (_m_current_state.equals("PRE_MOVEMENT")){
+                timeLeft = _m_current_timeLeft;
+                adviceSpeed = determinatedDistance/timeLeft;
+                if(adviceSpeed < lowerLimit){
+                    //still a long time to wait for green light
+                    textViewAdvice.setText("Stop! Still a long time before green!");
+                } else if(adviceSpeed > upperLimit){
+                    //The light will soon be green
+                    textViewAdvice.setText("Speed up! But pay attention to maximum speed!");
+                    textViewAdviceSpeed.setText(String.format("%.2f km/h",upperLimit*3.6));
+                } else{
+                    if(adviceSpeed < currentSpeed){
+                        //still a long time to wait for green light, but not too long
+                        textViewAdvice.setText("Slow down! Still a long time before green!");
+                        textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed*3.6));
+                    } else if(adviceSpeed > currentSpeed){
+                        //The light will soon be green, but no too soon
+                        textViewAdvice.setText("Speed up! Greening light is coming！");
+                        textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed*3.6));
+                    }
+                }
+            }
+        }
+
+
+
         /*
         float adviceSpeed = 0f;
         if(adviceSpeed > 50 || adviceSpeed < 30){
@@ -526,6 +642,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         String state;
         String[] result = calculateCurrentState(signalGroupId).split(":");
         state = result[0];
+        _m_current_state=state;
         timeLeft = Long.valueOf(result[1]);
         _m_timeLeft = timeLeft;
         //updateTrafficLight
@@ -537,6 +654,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onTick(long millisUntilFinished) {
                 //updateCountDownText
                 int seconds = (int) millisUntilFinished / 1000;
+                _m_current_timeLeft = seconds;
                 String timeLeftFormatted = String.format(Locale.getDefault(), "%02d", seconds);
                 //TextView textView = (TextView) findViewById(_m_idDictionary.get("timer"+signalGroupId));
 

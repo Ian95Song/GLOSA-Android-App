@@ -496,7 +496,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      * Return: none
      * Description: set corresponding traffic light model and generate driving advice
      */
-    @SuppressLint("DefaultLocale")
     private void generateAdvice(float currentSpeed, double determinatedDistance, int determinatedSignalGroupId){
         timer(determinatedSignalGroupId);
         TextView textViewAdvice = findViewById(R.id.mainTextViewAdvice);
@@ -539,8 +538,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (currentSpeed>upperLimit){
             textViewAdvice.setText("Too fast！Slow down!");
         }else{
-            if (_m_current_state.equals("PROTECTED_MOVEMENT_ALLOWED")){
-                timeLeft = _m_current_timeLeft+durationOfEachState.get("PROTECTED_CLEARANCE");
+            if ((_m_current_state.equals("PROTECTED_MOVEMENT_ALLOWED"))||(_m_current_state.equals("PROTECTED_CLEARANCE"))){
+                if (_m_current_state.equals("PROTECTED_MOVEMENT_ALLOWED")){
+                    timeLeft = _m_current_timeLeft+durationOfEachState.get("PROTECTED_CLEARANCE");
+                }else{
+                    timeLeft = _m_current_timeLeft;
+                }
                 adviceSpeed = determinatedDistance/timeLeft;
                 if(adviceSpeed > upperLimit){
                     //only a very little time left, not possible to reach
@@ -554,45 +557,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     textViewAdvice.setText("Keep your speed! Enough time!");
                 }
 
-            } else if (_m_current_state.equals("PROTECTED_CLEARANCE")){
-                timeLeft = _m_current_timeLeft;
-                adviceSpeed = determinatedDistance/timeLeft;
-                if(adviceSpeed > upperLimit){
-                    //only a very little time left, not possible to reach
-                    textViewAdvice.setText("Stop! Out of time!");
-                } else if(adviceSpeed > currentSpeed){
-                    //still enough time to reach, but need to speed up
-                    textViewAdvice.setText("Speed Up!");
-                    textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed*3.6));
-                } else{
-                    //very enough time, and only little distance
-                    textViewAdvice.setText("Keep your speed! Enough time!");
+            } else if ((_m_current_state.equals("STOP_AND_REMAIN"))||(_m_current_state.equals("PRE_MOVEMENT"))){
+                if (_m_current_state.equals("STOP_AND_REMAIN")){
+                    timeLeft=_m_current_timeLeft+durationOfEachState.get("PRE_MOVEMENT");
+                }else{
+                    timeLeft = _m_current_timeLeft;
                 }
-
-            } else if (_m_current_state.equals("STOP_AND_REMAIN")){
-                timeLeft=_m_current_timeLeft+durationOfEachState.get("PRE_MOVEMENT");
-                adviceSpeed = determinatedDistance/timeLeft;
-                if(adviceSpeed < lowerLimit){
-                    //still a long time to wait for green light
-                    textViewAdvice.setText("Stop! Still a long time before green!");
-                } else if(adviceSpeed > upperLimit){
-                    //The light will soon be green
-                    textViewAdvice.setText("Speed up! But pay attention to maximum speed!");
-                    textViewAdviceSpeed.setText(String.format("%.2f km/h",upperLimit*3.6));
-                } else{
-                    if(adviceSpeed < currentSpeed){
-                        //still a long time to wait for green light, but not too long
-                        textViewAdvice.setText("Slow down! Still a long time before green!");
-                        textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed*3.6));
-                    } else if(adviceSpeed > currentSpeed){
-                        //The light will soon be green, but no too soon
-                        textViewAdvice.setText("Speed up! Greening light is coming！");
-                        textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed*3.6));
-                    }
-                }
-
-            } else if (_m_current_state.equals("PRE_MOVEMENT")){
-                timeLeft = _m_current_timeLeft;
                 adviceSpeed = determinatedDistance/timeLeft;
                 if(adviceSpeed < lowerLimit){
                     //still a long time to wait for green light
@@ -614,7 +584,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         }
-
 
 
         /*

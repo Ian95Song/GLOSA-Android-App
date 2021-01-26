@@ -47,6 +47,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -306,11 +307,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             _m_gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 19f));
             //add speed information on the current location
 
-            //Log.i("Current Speed", String.format("%.1f km/h",currentSpeed));
-            //Marker markerCurrent = _m_gMap.addMarker(new MarkerOptions()
-            //        .position(locationCurrent).alpha(0.0f)
-            //        .title(String.format("%.1f km/h",currentSpeed)));
-            //markerCurrent.showInfoWindow();
+            Log.i("Current Speed", String.format("%.1f km/h",currentSpeed));
+            Marker markerCurrent = _m_gMap.addMarker(new MarkerOptions()
+                    .position(currentLatLng).alpha(0.0f)
+                    .title(String.format("%.1f km/h",currentSpeed)));
+            markerCurrent.showInfoWindow();
 
             //add red trajectory line on the map
             if (_m_location !=null){
@@ -425,6 +426,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      * Input: none
      * Return: corresponding signal group
      * Description: do determination job
+     *              currentSpeed in km/h
      */
     private void determinate(UTMLocation currentLocation, float currentSpeed){
         _m_determinated = true;
@@ -495,6 +497,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      * Input: none
      * Return: none
      * Description: set corresponding traffic light model and generate driving advice
+     *              currentSpeed in km/h
      */
     private void generateAdvice(float currentSpeed, double determinatedDistance, int determinatedSignalGroupId){
         timer(determinatedSignalGroupId);
@@ -508,11 +511,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         double upperLimit = 0.0;
         double lowerLimit = 0.0;
         if (_m_mode_selected.equals("vehicle")){
-            upperLimit = 50/3.6; // 50km/h
-            lowerLimit = 30/3.6; // 30 km/h
+            upperLimit = 50.0; // 50km/h
+            lowerLimit = 30.0; // 30 km/h
         }
         else if (_m_mode_selected.equals("bikeLane")){
-            upperLimit = 15/3.6; // 15 km/h
+            upperLimit = 15.0; // 15 km/h
             lowerLimit = 0.0; // 0 km/h
         }
 
@@ -537,6 +540,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         if (currentSpeed>upperLimit){
             textViewAdvice.setText("Too fast！Slow down!");
+            textViewAdviceSpeed.setText(String.format("%.2f km/h",upperLimit));
         }else{
             if ((_m_current_state.equals("PROTECTED_MOVEMENT_ALLOWED"))||(_m_current_state.equals("PROTECTED_CLEARANCE"))){
                 if (_m_current_state.equals("PROTECTED_MOVEMENT_ALLOWED")){
@@ -544,17 +548,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }else{
                     timeLeft = _m_current_timeLeft;
                 }
-                adviceSpeed = determinatedDistance/timeLeft;
+                adviceSpeed = determinatedDistance/timeLeft*3.6; //in km/h
                 if(adviceSpeed > upperLimit){
                     //only a very little time left, not possible to reach
                     textViewAdvice.setText("Stop! Out of time!");
+//                    textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed));
+                    textViewAdviceSpeed.setText("0 km/h");
                 } else if(adviceSpeed > currentSpeed){
                     //still enough time to reach, but need to speed up
                     textViewAdvice.setText("Speed Up! GOGOGO!");
-                    textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed*3.6));
+                    textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed));
                 } else{
                     //very enough time, and only little distance
-                    textViewAdvice.setText("Keep your speed! Enough time!");
+                    textViewAdvice.setText("Keep your speed! Time is enough!");
+                    textViewAdviceSpeed.setText(String.format("%.2f km/h",currentSpeed));
                 }
 
             } else if ((_m_current_state.equals("STOP_AND_REMAIN"))||(_m_current_state.equals("PRE_MOVEMENT"))){
@@ -563,23 +570,29 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }else{
                     timeLeft = _m_current_timeLeft;
                 }
-                adviceSpeed = determinatedDistance/timeLeft;
+                adviceSpeed = determinatedDistance/timeLeft*3.6; // in km/h
                 if(adviceSpeed < lowerLimit){
                     //still a long time to wait for green light
                     textViewAdvice.setText("Stop! Still a long time before green!");
+                    textViewAdviceSpeed.setText("0 km/h");
                 } else if(adviceSpeed > upperLimit){
                     //The light will soon be green
                     textViewAdvice.setText("Speed up! But pay attention to maximum speed!");
-                    textViewAdviceSpeed.setText(String.format("%.2f km/h",upperLimit*3.6));
+//                    textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed));
+                    textViewAdviceSpeed.setText(String.format("%.2f km/h",upperLimit));
                 } else{
                     if(adviceSpeed < currentSpeed){
                         //still a long time to wait for green light, but not too long
                         textViewAdvice.setText("Slow down! Still a long time before green!");
-                        textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed*3.6));
+                        textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed));
                     } else if(adviceSpeed > currentSpeed){
                         //The light will soon be green, but no too soon
                         textViewAdvice.setText("Speed up! Greening light is coming！");
-                        textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed*3.6));
+                        textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed));
+                    }else if(adviceSpeed == currentSpeed){
+                        //The light will soon be green, but no too soon
+                        textViewAdvice.setText("Keep your speed! Greening light is coming！");
+                        textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed));
                     }
                 }
             }

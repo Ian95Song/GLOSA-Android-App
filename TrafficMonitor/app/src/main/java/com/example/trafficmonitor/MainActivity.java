@@ -114,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String[] _m_modes = {"vehicle", "bikeLane", "bikeLane"};
     private String _m_mode_selected;
     private GoogleMap _m_gMap;
+    private MarkerManager _m_markerManager;
     private List<Lane> _m_trafficLights;
     private Location _m_location;
     private boolean _m_determinated = false;
@@ -139,6 +140,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 findViewById(R.id.mainLoadingPanel).setVisibility(View.GONE);
                                 _m_dataResourceLoaded = true;
                                 Toast.makeText(MainActivity.this, "Get Spat Json Successfully", Toast.LENGTH_SHORT).show();
+                                if(_m_mapInfo != null){
+                                    _m_trafficLights =  _m_mapInfo.map.intersection.lanes;
+                                }
+                                if(_m_trafficLights != null){
+                                    showTrafficLights();
+                                }
                             } else {
                                 _m_dataResourceLoaded = false;
                                 Toast.makeText(MainActivity.this, "Invalid Authorization or Server down", Toast.LENGTH_SHORT).show();
@@ -278,12 +285,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         );
 
         rlp.setMargins(0, 0, px, px);
-        if(_m_mapInfo != null){
-            _m_trafficLights =  _m_mapInfo.map.intersection.lanes;
-        }
-        if(_m_trafficLights != null){
-            //showTrafficLights();
-        }
+        _m_markerManager = new MarkerManager(_m_gMap);
     }
 
     /*
@@ -387,10 +389,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      * Description: show traffic lights with their positions and states at map view
      */
     private void showTrafficLights(){
-        MarkerManager markerManager = new MarkerManager(_m_gMap);
-        MarkerManager.Collection markerCollection = markerManager.newCollection();
+        MarkerManager.Collection markerCollection = _m_markerManager.newCollection("TL");
         for(int i = 0; i < _m_trafficLights.size(); i++){
-            markerCollection.addMarker(
+            Marker marker = markerCollection.addMarker(
                     new MarkerOptions()
                             .position(
                                     new LatLng(
@@ -399,8 +400,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     )
                             )
                             .icon(BitmapDescriptorFactory.fromBitmap(getTrafficLightBitmap("STOP_AND_REMAIN")))
-                            .title("nameTest")
+                            .title("Lane: " + _m_trafficLights.get(i).id)
             );
+            marker.setTag(_m_trafficLights.get(i).signalGroup);
+            timerTLOnMap(_m_trafficLights.get(i).signalGroup);
         }
     }
 
@@ -413,6 +416,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Bitmap getTrafficLightBitmap(String state){
         InputStream is;
         switch (state){
+
+            case "STOP_AND_REMAIN":
+                is = getResources().openRawResource(R.drawable.red);
+                break;
+            case "DARK":
+                is = getResources().openRawResource(R.drawable.dark);
+                break;
+            case "PRE_MOVEMENT":
+                is = getResources().openRawResource(R.drawable.red_yellow);
+                break;
+            case "PROTECTED_MOVEMENT_ALLOWED":
+                is = getResources().openRawResource(R.drawable.green);
+                break;
+            case "PROTECTED_CLEARANCE":
+                is = getResources().openRawResource(R.drawable.yellow);
+                break;
             default:
                 is = getResources().openRawResource(R.drawable.red);
                 break;
@@ -843,6 +862,44 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         };
         Thread thread = new Thread(runnable);
         thread.start();
+    }
+
+    /*
+     * Input: none
+     * Return: none
+     * Description: start timer and update ImageView of traffic lights on the map
+     */
+    private void timerTLOnMap(int signalGroupId) {
+        long timeLeft;
+        String state;
+        String[] result = calculateCurrentState(signalGroupId).split(":");
+        state = result[0];
+        timeLeft = Long.valueOf(result[1]);
+        //updateTrafficLight
+
+        for(Object obj :_m_markerManager.getCollection("TL").getMarkers().toArray()){
+            Marker marker = (Marker) obj;
+            if((Integer)marker.getTag() == signalGroupId){
+                marker.setIcon(BitmapDescriptorFactory.fromBitmap(getTrafficLightBitmap(state)));
+            }
+        }
+        new CountDownTimer(timeLeft, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                //updateCountDownText
+                int seconds = (int) millisUntilFinished / 1000;
+                String timeLeftFormatted = String.format(Locale.getDefault(), "%02d", seconds);
+            }
+            @Override
+            public void onFinish() {
+                if(!_m_timeCleared){
+                    timerTLOnMap(signalGroupId);
+                } else {
+                    Log.d(TAG, "Timer cleared");
+                    _m_timeCleared = false;
+                }
+            }
+        }.start();
     }
 
 }

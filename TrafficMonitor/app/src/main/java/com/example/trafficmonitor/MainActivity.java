@@ -115,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String _m_mode_selected;
     private GoogleMap _m_gMap;
     private MarkerManager _m_markerManager;
+    private List<Polyline> _m_polylines;
     private List<Lane> _m_trafficLights;
     private Location _m_location;
     private boolean _m_determinated = false;
@@ -235,7 +236,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View v) {
                 if(_m_gMap != null){
-                    _m_gMap.clear();
+                    //_m_gMap.clear();
+                    for(Polyline line : _m_polylines)
+                    {
+                        line.remove();
+                    }
+
+                    _m_polylines.clear();
                 }
                 if(_m_timer != null){
                     _m_timeCleared = true;
@@ -247,6 +254,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
         _s_instance = this;
+        _m_polylines = new ArrayList<>();
         _m_idDictionary = new HashMap<>();
         _m_imageResource_trafficLights = new HashMap<>();
         _m_imageResource_trafficLights.put("STOP_AND_REMAIN", R.drawable.red);
@@ -317,10 +325,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             //add red trajectory line on the map
             if (_m_location !=null){
-                Polyline line = _m_gMap.addPolyline(new PolylineOptions()
+                _m_polylines.add(_m_gMap.addPolyline(new PolylineOptions()
                         .add(currentLatLng, new LatLng(_m_location.getLatitude(),_m_location.getLongitude()))
                         .width(5)
-                        .color(Color.RED));
+                        .color(Color.RED)));
             }
             _m_location=location;
         }

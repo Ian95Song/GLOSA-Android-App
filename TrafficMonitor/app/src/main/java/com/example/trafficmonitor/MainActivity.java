@@ -457,6 +457,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      */
     private void determinate(UTMLocation currentLocation, float currentSpeed){
         _m_determinated = true;
+        if(_m_timer != null){
+            _m_timeCleared = true;
+            _m_timer.cancel();
+        }
         int determinatedLaneId = 0;
         int determinatedSignalGroupId = 0;
         List<String> determinatedManeuvers = new ArrayList();
@@ -479,14 +483,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     determinatedDistance = distance;
                     determinatedLaneId = Integer.valueOf(connection.properties.fromLane);
                     determinatedSignalGroupId = Integer.valueOf(connection.properties.signalGroup);
-                    determinatedManeuvers.add(connection.properties.maneuver);
-                } else if (distance < determinatedDistance){
-                    determinatedManeuvers.add(connection.properties.maneuver);
+                    if(!determinatedManeuvers.contains(connection.properties.maneuver)){
+                        determinatedManeuvers.add(connection.properties.maneuver);
+                    }
+                } else if (distance == determinatedDistance){
+                    if(!determinatedManeuvers.contains(connection.properties.maneuver)){
+                        determinatedManeuvers.add(connection.properties.maneuver);
+                    }
                 }
             }
         }
         Log.d("Determination", "Result lane ID: "+determinatedLaneId+" signal group ID: "+determinatedSignalGroupId+" maneuvers: "+determinatedManeuvers.size());
 
+        TextView textViewLane = findViewById(R.id.mainTextViewLane);
+        textViewLane.setText("Lane ID: " + determinatedLaneId);
         TextView textViewSignalGroup = findViewById(R.id.mainTextViewSignalGroup);
         textViewSignalGroup.setText("Signal Group: " + determinatedSignalGroupId);
         String maneuvers = "";

@@ -19,32 +19,112 @@
         app:layout_constraintTop_toBottomOf="@+id/toolbar" />
     <LinearLayout
         android:id="@+id/mainModeButtonGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
         android:layout_marginBottom="30dp"
         android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
         <ImageButton
             android:id="@+id/mainImageButtonCar"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="20dp"
             app:srcCompat="@drawable/ic_action_name" />
         <ImageButton
             android:id="@+id/mainImageButtonBicycle"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             app:srcCompat="@drawable/bicycle_icon" />
-        <ImageButton
-            android:id="@+id/mainImageButtonWalking"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            app:srcCompat="@drawable/walking_icon" />
-        <Button
-            android:id="@+id/mainButtonClear"
-            android:text="Clear"
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="50dp"
+            android:gravity="right" >
+            <ImageButton
+                android:id="@+id/mainImageButtonSet"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginRight="10dp"
+                app:srcCompat="@drawable/set_icon" />
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/mainSetGroup"
+        android:background="@color/white"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right" >
+            <ImageButton
+                android:id="@+id/mainImageButtonExitSet"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_gravity="right"
+                android:background="@color/white"
+                app:srcCompat="@drawable/exit_icon" />
+        </LinearLayout>
+        <TextView
+            android:id="@+id/mainTextViewPolyline"
             android:layout_width="wrap_content"
-            android:layout_height="40dp" />
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="Poly Line of Driving Track"
+            android:textColor="#000000"
+            android:textSize="14dp"
+            android:textStyle="bold"/>
+        <View android:layout_height="1px" android:background="#000000" android:layout_width="fill_parent"></View>
+        <LinearLayout
+            android:background="@color/white"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="parent">
+            <CheckBox
+                android:id="@+id/mainCheckBoxDrawPolyline"
+                android:text="Draw"
+                android:checked="false"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/mainTextViewPolyline"
+                app:layout_constraintStart_toStartOf="parent"/>
+            <Button
+                android:id="@+id/mainButtonClear"
+                android:text="Clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"/>
+        </LinearLayout>
+        <TextView
+            android:id="@+id/mainTextViewCamera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="Moving Camera"
+            android:textColor="#000000"
+            android:textSize="14dp"
+            android:textStyle="bold"/>
+        <View android:layout_height="1px" android:background="#000000" android:layout_width="fill_parent"></View>
+        <LinearLayout
+            android:background="@color/white"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="parent">
+            <CheckBox
+                android:id="@+id/mainCheckBoxAutoCamera"
+                android:text="Automatic Camera"
+                android:checked="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/mainTextViewPolyline"
+                app:layout_constraintStart_toStartOf="parent"/>
+        </LinearLayout>
     </LinearLayout>
     <LinearLayout
         android:id="@+id/mainPopupGroup"
@@ -121,7 +201,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Advice Speed:"
+                android:text="Advice Speed:km/h"
                 android:textColor="#000000"
                 android:textSize="14dp"
                 android:textStyle="bold"

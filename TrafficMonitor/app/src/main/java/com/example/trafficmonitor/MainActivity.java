@@ -24,11 +24,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -94,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     // Traffic light timer parameters
     HashMap<String, Integer> _m_imageResource_trafficLights;
-    private HashMap<String, Integer> _m_idDictionary;
+    //private HashMap<String, Integer> _m_idDictionary;
     private CountDownTimer _m_timer;
     private boolean _m_timeCleared = false;
     private long _m_timeLeft = 0;
@@ -108,16 +112,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LanesKML _m_lanes;
     private ConnectionsKML _m_connections;
     private boolean _m_dataResourceLoaded = false;
-    private ImageButton[] _m_imageButtons = new ImageButton[3];
+    private ImageButton[] _m_imageButtons = new ImageButton[2];
     private ImageButton _m_imageButton_unfocus;
-    private int[] _m_imageButton_id = {R.id.mainImageButtonCar, R.id.mainImageButtonBicycle, R.id.mainImageButtonWalking};
-    private String[] _m_modes = {"vehicle", "bikeLane", "bikeLane"};
+    private int[] _m_imageButton_id = {R.id.mainImageButtonCar, R.id.mainImageButtonBicycle};
+    private String[] _m_modes = {"vehicle", "bikeLane"};
     private String _m_mode_selected;
     private GoogleMap _m_gMap;
     private MarkerManager _m_markerManager;
     private List<Polyline> _m_polylines;
     private List<Lane> _m_trafficLights;
     private Location _m_location;
+    private boolean _m_drawPolyline = false;
+    private boolean _m_autoCamera = true;
     private boolean _m_determinated = false;
 
     public class ClientReceiver extends BroadcastReceiver {
@@ -217,11 +223,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             setModeFocus(_m_imageButton_unfocus, _m_imageButtons[1]);
                             _m_mode_selected = _m_modes[1];
                             break;
-
-                        case R.id.mainImageButtonWalking :
-                            setModeFocus(_m_imageButton_unfocus, _m_imageButtons[2]);
-                            _m_mode_selected = _m_modes[2];
-                            break;
                     }
                 }
             });
@@ -236,26 +237,66 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View v) {
                 if(_m_gMap != null){
-                    //_m_gMap.clear();
                     for(Polyline line : _m_polylines)
                     {
                         line.remove();
                     }
-
                     _m_polylines.clear();
                 }
-                if(_m_timer != null){
-                    _m_timeCleared = true;
-                    _m_timer.cancel();
+            }
+        });
+
+        CheckBox drawPolylineCheckbox = findViewById(R.id.mainCheckBoxDrawPolyline);
+        drawPolylineCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    _m_drawPolyline = true;
+                }else{
+                    _m_drawPolyline = false;
+                    for(Polyline line : _m_polylines)
+                    {
+                        line.remove();
+                    }
+                    _m_polylines.clear();
                 }
-                LinearLayout popupGroup = findViewById(R.id.mainPopupGroup);
-                popupGroup.setVisibility(View.GONE);
+
+            }
+        });
+        CheckBox autoCameraCheckbox = findViewById(R.id.mainCheckBoxAutoCamera);
+        autoCameraCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    _m_autoCamera = true;
+                }else{
+                    _m_autoCamera = false;
+                }
+
+            }
+        });
+
+        ImageButton setImageButton = findViewById(R.id.mainImageButtonSet);
+        setImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LinearLayout setGroup = findViewById(R.id.mainSetGroup);
+                setGroup.setVisibility(View.VISIBLE);
+            }
+        });
+
+        ImageButton exitSetImageButton = findViewById(R.id.mainImageButtonExitSet);
+        exitSetImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LinearLayout setGroup = findViewById(R.id.mainSetGroup);
+                setGroup.setVisibility(View.GONE);
             }
         });
 
         _s_instance = this;
         _m_polylines = new ArrayList<>();
-        _m_idDictionary = new HashMap<>();
+        //_m_idDictionary = new HashMap<>();
         _m_imageResource_trafficLights = new HashMap<>();
         _m_imageResource_trafficLights.put("STOP_AND_REMAIN", R.drawable.red);
         _m_imageResource_trafficLights.put("PRE_MOVEMENT", R.drawable.red_yellow);
@@ -280,19 +321,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         _m_gMap.setMyLocationEnabled(true);
         View locationButton = ((View) findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
-        RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+        //RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+        RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(locationButton.getLayoutParams().width, locationButton.getLayoutParams().height);
         // position on right bottom
         rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+        rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
         rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
 
-        float dip = 30f;
-        int px = (int) TypedValue.applyDimension(
+        float dip_bottom = 100f;
+        int px_bottom = (int) TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
-                dip,
+                dip_bottom,
                 getResources().getDisplayMetrics()
         );
-
-        rlp.setMargins(0, 0, px, px);
+        float dip_right = 15f;
+        int px_right = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                dip_right,
+                getResources().getDisplayMetrics()
+        );
+        rlp.setMargins(0, 0, px_right, px_bottom);
+        locationButton.setLayoutParams(rlp);
         _m_markerManager = new MarkerManager(_m_gMap);
     }
 
@@ -314,7 +363,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
         float currentSpeed = (float) (location.getSpeed() * 3.6); //in km/h
         if(_m_gMap != null) {
-            _m_gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 19f));
+            if(_m_autoCamera){
+                _m_gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 19f));
+            }
             //add speed information on the current location
 
             Log.i("Current Speed", String.format("%.1f km/h",currentSpeed));
@@ -324,7 +375,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             markerCurrent.showInfoWindow();
 
             //add red trajectory line on the map
-            if (_m_location !=null){
+            if (_m_location !=null && _m_drawPolyline){
                 _m_polylines.add(_m_gMap.addPolyline(new PolylineOptions()
                         .add(currentLatLng, new LatLng(_m_location.getLatitude(),_m_location.getLongitude()))
                         .width(5)
@@ -577,7 +628,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         if (currentSpeed>upperLimit){
             textViewAdvice.setText("Too fast！Slow down!");
-            textViewAdviceSpeed.setText(String.format("%.2f km/h",upperLimit));
+            textViewAdviceSpeed.setText(String.format("%.2f",upperLimit));
         }else{
             if ((_m_current_state.equals("PROTECTED_MOVEMENT_ALLOWED"))||(_m_current_state.equals("PROTECTED_CLEARANCE"))){
                 if (_m_current_state.equals("PROTECTED_MOVEMENT_ALLOWED")){
@@ -590,15 +641,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     //only a very little time left, not possible to reach
                     textViewAdvice.setText("Stop! Out of time!");
 //                    textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed));
-                    textViewAdviceSpeed.setText("0 km/h");
+                    textViewAdviceSpeed.setText("0");
                 } else if(adviceSpeed > currentSpeed){
                     //still enough time to reach, but need to speed up
                     textViewAdvice.setText("Speed Up! GOGOGO!");
-                    textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed));
+                    textViewAdviceSpeed.setText(String.format("%.2f",adviceSpeed));
                 } else{
                     //very enough time, and only little distance
                     textViewAdvice.setText("Keep your speed! Time is enough!");
-                    textViewAdviceSpeed.setText(String.format("%.2f km/h",currentSpeed));
+                    textViewAdviceSpeed.setText(String.format("%.2f",currentSpeed));
                 }
 
             } else if ((_m_current_state.equals("STOP_AND_REMAIN"))||(_m_current_state.equals("PRE_MOVEMENT"))){
@@ -611,25 +662,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if(adviceSpeed < lowerLimit){
                     //still a long time to wait for green light
                     textViewAdvice.setText("Stop! Still a long time before green!");
-                    textViewAdviceSpeed.setText("0 km/h");
+                    textViewAdviceSpeed.setText("0");
                 } else if(adviceSpeed > upperLimit){
                     //The light will soon be green
                     textViewAdvice.setText("Speed up! But pay attention to maximum speed!");
 //                    textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed));
-                    textViewAdviceSpeed.setText(String.format("%.2f km/h",upperLimit));
+                    textViewAdviceSpeed.setText(String.format("%.2f",upperLimit));
                 } else{
                     if(adviceSpeed < currentSpeed){
                         //still a long time to wait for green light, but not too long
                         textViewAdvice.setText("Slow down! Still a long time before green!");
-                        textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed));
+                        textViewAdviceSpeed.setText(String.format("%.2f",adviceSpeed));
                     } else if(adviceSpeed > currentSpeed){
                         //The light will soon be green, but no too soon
                         textViewAdvice.setText("Speed up! Greening light is coming！");
-                        textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed));
+                        textViewAdviceSpeed.setText(String.format("%.2f",adviceSpeed));
                     }else if(adviceSpeed == currentSpeed){
                         //The light will soon be green, but no too soon
                         textViewAdvice.setText("Keep your speed! Greening light is coming！");
-                        textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed));
+                        textViewAdviceSpeed.setText(String.format("%.2f",adviceSpeed));
                     }
                 }
             }

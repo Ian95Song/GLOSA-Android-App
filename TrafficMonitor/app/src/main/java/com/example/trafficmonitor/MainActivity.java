@@ -448,22 +448,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      * Description: show traffic lights with their positions and states at map view
      */
     private void showTrafficLights(){
-        MarkerManager.Collection markerCollection = _m_markerManager.newCollection("TL");
-        for(int i = 0; i < _m_trafficLights.size(); i++){
-            Marker marker = markerCollection.addMarker(
-                    new MarkerOptions()
-                            .position(
-                                    new LatLng(
-                                            _m_trafficLights.get(i).positionWGS84.lat,
-                                            _m_trafficLights.get(i).positionWGS84.lng
-                                    )
-                            )
-                            .icon(BitmapDescriptorFactory.fromBitmap(getTrafficLightBitmap("STOP_AND_REMAIN")))
-                            .title("Lane: " + _m_trafficLights.get(i).id)
-            );
-            marker.setTag(_m_trafficLights.get(i).signalGroup);
-            timerTLOnMap(_m_trafficLights.get(i).signalGroup);
+        if (_m_markerManager!=null){
+            MarkerManager.Collection markerCollection = _m_markerManager.newCollection("TL");
+            for(int i = 0; i < _m_trafficLights.size(); i++){
+                Marker marker = markerCollection.addMarker(
+                        new MarkerOptions()
+                                .position(
+                                        new LatLng(
+                                                _m_trafficLights.get(i).positionWGS84.lat,
+                                                _m_trafficLights.get(i).positionWGS84.lng
+                                        )
+                                )
+                                .icon(BitmapDescriptorFactory.fromBitmap(getTrafficLightBitmap("STOP_AND_REMAIN")))
+                                .title("Lane: " + _m_trafficLights.get(i).id)
+                );
+                marker.setTag(_m_trafficLights.get(i).signalGroup);
+                timerTLOnMap(_m_trafficLights.get(i).signalGroup);
+            }
         }
+
     }
 
     /*

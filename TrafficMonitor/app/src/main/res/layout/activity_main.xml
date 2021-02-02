@@ -63,8 +63,8 @@
             android:gravity="right" >
             <ImageButton
                 android:id="@+id/mainImageButtonExitSet"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:layout_gravity="right"
                 android:background="@color/white"
                 app:srcCompat="@drawable/exit_icon" />

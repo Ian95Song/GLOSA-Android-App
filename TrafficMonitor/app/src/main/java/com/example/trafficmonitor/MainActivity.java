@@ -460,7 +460,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                         )
                                 )
                                 .icon(BitmapDescriptorFactory.fromBitmap(getTrafficLightBitmap("STOP_AND_REMAIN")))
-                                .title("Lane: " + _m_trafficLights.get(i).id)
+                                .title("Lane: " + _m_trafficLights.get(i).id + " Signal Group:" +_m_trafficLights.get(i).signalGroup)
                 );
                 marker.setTag(_m_trafficLights.get(i).signalGroup);
                 timerTLOnMap(_m_trafficLights.get(i).signalGroup);

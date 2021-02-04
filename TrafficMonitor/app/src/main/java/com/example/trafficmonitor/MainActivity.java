@@ -721,7 +721,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //updateTrafficLight
         //ImageView imageView = (ImageView) findViewById(_m_idDictionary.get("trafficLight"+signalGroupId));
         ImageView imageView = (ImageView) findViewById(R.id.mainImageViewTrafficLight);
-        imageView.setImageResource(_m_imageResource_trafficLights.get(state));
+        if(_m_imageResource_trafficLights.get(state) != null){
+            imageView.setImageResource(_m_imageResource_trafficLights.get(state));
+        }
         _m_timer = new CountDownTimer(timeLeft, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {

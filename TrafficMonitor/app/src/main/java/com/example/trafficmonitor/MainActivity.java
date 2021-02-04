@@ -8,6 +8,7 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -19,6 +20,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -126,6 +128,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private boolean _m_autoCamera = true;
     private boolean _m_determinated = false;
 
+    Dialog adviceDialog;
+    ImageView closeAdvicePopupImg;
+
+    public void showAdvicePobup(){
+        adviceDialog.setContentView(R.layout.advice_popup);
+        closeAdvicePopupImg = (ImageView) adviceDialog.findViewById(R.id.closeAdvicePopup);
+
+        closeAdvicePopupImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                adviceDialog.dismiss();
+            }
+        });
+        adviceDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        adviceDialog.show();
+    }
+
     public class ClientReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -183,6 +202,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         startService(_m_serviceIntent);
         bindService(_m_serviceIntent, _m_serviceConnection, BIND_AUTO_CREATE);
 
+
         Dexter.withContext(this)
             .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
             .withListener(new PermissionListener() {
@@ -202,6 +222,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Traffic Monitor");
+        getSupportActionBar().hide();
         //ActionBar ab = getSupportActionBar();
         //ab.setDisplayHomeAsUpEnabled(true);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -303,6 +324,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         _m_imageResource_trafficLights.put("PROTECTED_MOVEMENT_ALLOWED", R.drawable.green);
         _m_imageResource_trafficLights.put("PROTECTED_CLEARANCE", R.drawable.yellow);
         _m_imageResource_trafficLights.put("DARK", R.drawable.dark);
+
+        adviceDialog = new Dialog(this);
     }
 
     @Override
@@ -396,8 +419,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             } else {
                 if ((int)distance > 50){
                     _m_determinated = false;
-                    LinearLayout popupGroup = findViewById(R.id.mainPopupGroup);
-                    popupGroup.setVisibility(View.GONE);
+                    adviceDialog.hide();
+                    //LinearLayout popupGroup = findViewById(R.id.mainPopupGroup);
+                    //popupGroup.setVisibility(View.GONE);
                 }
             }
         }
@@ -549,10 +573,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         Log.d("Determination", "Result lane ID: "+determinatedLaneId+" signal group ID: "+determinatedSignalGroupId+" maneuvers: "+determinatedManeuvers.size());
 
-        TextView textViewLane = findViewById(R.id.mainTextViewLane);
-        textViewLane.setText("Lane ID: " + determinatedLaneId);
-        TextView textViewSignalGroup = findViewById(R.id.mainTextViewSignalGroup);
-        textViewSignalGroup.setText("Signal Group: " + determinatedSignalGroupId);
+        //TextView textViewLane = findViewById(R.id.mainTextViewLane);
+        //textViewLane.setText("Lane ID: " + determinatedLaneId);
+        //TextView textViewSignalGroup = findViewById(R.id.mainTextViewSignalGroup);
+        //textViewSignalGroup.setText("Signal Group: " + determinatedSignalGroupId);
         String maneuvers = "";
         for(String maneuver : determinatedManeuvers){
             switch (maneuver){
@@ -567,11 +591,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     break;
             }
         }
-        TextView textViewManeuvers = findViewById(R.id.mainTextViewManeuvers);
-        textViewManeuvers.setText(maneuvers);
+        //TextView textViewManeuvers = findViewById(R.id.mainTextViewManeuvers);
+        //textViewManeuvers.setText(maneuvers);
 
+        showAdvicePobup();
         generateAdvice(currentSpeed, determinatedDistance, determinatedSignalGroupId);
-        popupResult();
+        //popupResult();
+
     }
 
     /*
@@ -592,8 +618,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      */
     private void generateAdvice(float currentSpeed, double determinatedDistance, int determinatedSignalGroupId){
         timer(determinatedSignalGroupId);
-        TextView textViewAdvice = findViewById(R.id.mainTextViewAdvice);
-        TextView textViewAdviceSpeed = findViewById(R.id.mainTextViewAdviceSpeed);
+        TextView textViewAdvice = adviceDialog.findViewById(R.id.mainTextViewAdvice);
+        TextView textViewAdviceSpeed = adviceDialog.findViewById(R.id.mainTextViewAdviceSpeed);
         // todo use the time left, when moving is allowed, to calculate necessary speed to go through the intersection,
         //  or the time left, after that the traffic light will change into state green, to calculate necessary speed to wait green light before the intersection
         //  compare with current speed
@@ -720,8 +746,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         _m_timeLeft = timeLeft;
         //updateTrafficLight
         //ImageView imageView = (ImageView) findViewById(_m_idDictionary.get("trafficLight"+signalGroupId));
-        ImageView imageView = (ImageView) findViewById(R.id.mainImageViewTrafficLight);
-        imageView.setImageResource(_m_imageResource_trafficLights.get(state));
+        ImageView imageView = (ImageView) adviceDialog.findViewById(R.id.mainImageViewTrafficLight);
+        if(_m_imageResource_trafficLights.get(state) != null)
+        {
+            imageView.setImageResource(_m_imageResource_trafficLights.get(state));
+        }
         _m_timer = new CountDownTimer(timeLeft, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -731,7 +760,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 String timeLeftFormatted = String.format(Locale.getDefault(), "%02d", seconds);
                 //TextView textView = (TextView) findViewById(_m_idDictionary.get("timer"+signalGroupId));
 
-                TextView textViewTimer = (TextView) findViewById(R.id.mainTextViewTimer);
+                TextView textViewTimer = (TextView) adviceDialog.findViewById(R.id.mainTextViewTimer);
                 textViewTimer.setText(timeLeftFormatted);
             }
             @Override

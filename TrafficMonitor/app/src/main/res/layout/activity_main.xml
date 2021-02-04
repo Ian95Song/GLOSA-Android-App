@@ -126,28 +126,32 @@
                 app:layout_constraintStart_toStartOf="parent"/>
         </LinearLayout>
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/mainPopupGroup"
-        android:background="@color/white"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/white"
         android:orientation="horizontal"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
         <ImageView
-            android:id="@+id/mainImageViewTrafficLight"
+            android:id="@+id/mainImageViewTrafficLight_1"
             android:layout_width="128dp"
             android:layout_height="150dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/red" />
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginLeft="10dp"
             android:orientation="vertical">
+
             <TextView
                 android:id="@+id/mainTextViewLane"
                 android:layout_width="wrap_content"
@@ -155,7 +159,8 @@
                 android:text="Lane ID"
                 android:textColor="#000000"
                 android:textSize="14dp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
+
             <TextView
                 android:id="@+id/mainTextViewSignalGroup"
                 android:layout_width="wrap_content"
@@ -163,16 +168,18 @@
                 android:text="Signal Group"
                 android:textColor="#000000"
                 android:textSize="14dp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
+
             <TextView
-                android:id="@+id/mainTextViewTimer"
+                android:id="@+id/mainTextViewTimer_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="60"
                 android:textColor="#000000"
                 android:textSize="40dp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
+
             <TextView
                 android:id="@+id/mainTextViewManeuvers"
                 android:layout_width="wrap_content"
@@ -181,15 +188,17 @@
                 android:text="Left, Straight, Right"
                 android:textColor="#000000"
                 android:textSize="14dp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:orientation="vertical">
+
             <TextView
-                android:id="@+id/mainTextViewAdvice"
+                android:id="@+id/mainTextViewAdvice_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Speed Up"
@@ -197,7 +206,8 @@
                 android:textSize="14dp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+                app:layout_constraintTop_toTopOf="parent" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -206,16 +216,17 @@
                 android:textSize="14dp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+                app:layout_constraintTop_toTopOf="parent" />
+
             <TextView
-                android:id="@+id/mainTextViewAdviceSpeed"
+                android:id="@+id/mainTextViewAdviceSpeed_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="50"
                 android:textColor="#000000"
                 android:textSize="40dp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>
     <RelativeLayout

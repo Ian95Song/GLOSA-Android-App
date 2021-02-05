@@ -120,62 +120,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     Dialog adviceDialog;
     ImageView closeAdvicePopupImg;
 
-    public void showAdvicePobup(){
-        adviceDialog.setContentView(R.layout.advice_popup);
-        closeAdvicePopupImg = (ImageView) adviceDialog.findViewById(R.id.closeAdvicePopup);
-
-        closeAdvicePopupImg.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                adviceDialog.dismiss();
-            }
-        });
-        adviceDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        adviceDialog.show();
-    }
-
-    public class ClientReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent != null) {
-                final String action = intent.getAction();
-                if (SERVICE_RECEIVER.equals(action)) {
-                    Bundle resp = intent.getExtras();
-                    String task = (String) resp.get("task");
-                    String value = (String) resp.get("value");
-                    Log.d(TAG, task+":"+value);
-                    switch (task) {
-                        case ClientService.RESP_REQ_SPAT_JSON:
-                            if(Boolean.valueOf(value)){
-                                _m_mapInfo = Utils.mapInfoParser(_m_clientBinder.getMapInfoJson());
-                                _m_intersection_location = new UTMLocation(_m_mapInfo.map.intersection.positionUTM.east, _m_mapInfo.map.intersection.positionUTM.north);
-                                _m_spat = Utils.spatParser(_m_clientBinder.getSpatJson());
-                                _m_lanes = Utils.lanesParser(_m_clientBinder.getLanesJson());
-                                _m_connections = Utils.connectionsParser(_m_clientBinder.getConnectionsJson());
-                                findViewById(R.id.mainLoadingPanel).setVisibility(View.GONE);
-                                _m_dataResourceLoaded = true;
-                                Toast.makeText(MainActivity.this, "Get Spat Json Successfully", Toast.LENGTH_SHORT).show();
-                                if(_m_mapInfo != null){
-                                    _m_trafficLights =  _m_mapInfo.map.intersection.lanes;
-                                }
-                                if(_m_trafficLights != null){
-                                    showTrafficLights();
-                                }
-                            } else {
-                                _m_dataResourceLoaded = false;
-                                Toast.makeText(MainActivity.this, "Invalid Authorization or Server down", Toast.LENGTH_SHORT).show();
-                            }
-                            break;
-                    }
-                }
-            }
-        }
-    }
-
-    public static MainActivity getInstance() {
-        return _s_instance;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -193,20 +137,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
         Dexter.withContext(this)
-            .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-            .withListener(new PermissionListener() {
-                @Override
-                public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
-                    startLocationRequest();
-                }
-                @Override
-                public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
-                    Toast.makeText(MainActivity.this, "You need to accept Location request", Toast.LENGTH_SHORT).show();
-                }
-                @Override
-                public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
-                }
-            }).check();
+                .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                .withListener(new PermissionListener() {
+                    @Override
+                    public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
+                        startLocationRequest();
+                    }
+                    @Override
+                    public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+                        Toast.makeText(MainActivity.this, "You need to accept Location request", Toast.LENGTH_SHORT).show();
+                    }
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
+                    }
+                }).check();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -320,6 +264,62 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         stopService(_m_serviceIntent);
         unregisterReceiver(_m_clientReceiver);
         super.onDestroy();
+    }
+
+    public void showAdvicePobup(){
+        adviceDialog.setContentView(R.layout.advice_popup);
+        closeAdvicePopupImg = (ImageView) adviceDialog.findViewById(R.id.closeAdvicePopup);
+
+        closeAdvicePopupImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                adviceDialog.dismiss();
+            }
+        });
+        adviceDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        adviceDialog.show();
+    }
+
+    public class ClientReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null) {
+                final String action = intent.getAction();
+                if (SERVICE_RECEIVER.equals(action)) {
+                    Bundle resp = intent.getExtras();
+                    String task = (String) resp.get("task");
+                    String value = (String) resp.get("value");
+                    Log.d(TAG, task+":"+value);
+                    switch (task) {
+                        case ClientService.RESP_REQ_SPAT_JSON:
+                            if(Boolean.valueOf(value)){
+                                _m_mapInfo = Utils.mapInfoParser(_m_clientBinder.getMapInfoJson());
+                                _m_intersection_location = new UTMLocation(_m_mapInfo.map.intersection.positionUTM.east, _m_mapInfo.map.intersection.positionUTM.north);
+                                _m_spat = Utils.spatParser(_m_clientBinder.getSpatJson());
+                                _m_lanes = Utils.lanesParser(_m_clientBinder.getLanesJson());
+                                _m_connections = Utils.connectionsParser(_m_clientBinder.getConnectionsJson());
+                                findViewById(R.id.mainLoadingPanel).setVisibility(View.GONE);
+                                _m_dataResourceLoaded = true;
+                                Toast.makeText(MainActivity.this, "Get Spat Json Successfully", Toast.LENGTH_SHORT).show();
+                                if(_m_mapInfo != null){
+                                    _m_trafficLights =  _m_mapInfo.map.intersection.lanes;
+                                }
+                                if(_m_trafficLights != null){
+                                    showTrafficLights();
+                                }
+                            } else {
+                                _m_dataResourceLoaded = false;
+                                Toast.makeText(MainActivity.this, "Invalid Authorization or Server down", Toast.LENGTH_SHORT).show();
+                            }
+                            break;
+                    }
+                }
+            }
+        }
+    }
+
+    public static MainActivity getInstance() {
+        return _s_instance;
     }
 
     @Override
@@ -584,10 +584,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         timer(determinatedSignalGroupId);
         TextView textViewAdvice = adviceDialog.findViewById(R.id.mainTextViewAdvice);
         TextView textViewAdviceSpeed = adviceDialog.findViewById(R.id.mainTextViewAdviceSpeed);
-        // todo use the time left, when moving is allowed, to calculate necessary speed to go through the intersection,
-        //  or the time left, after that the traffic light will change into state green, to calculate necessary speed to wait green light before the intersection
-        //  compare with current speed
-
         //set different upper&lower speed limit
         double upperLimit = 0.0;
         double lowerLimit = 0.0;
@@ -633,7 +629,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if(adviceSpeed > upperLimit){
                     //only a very little time left, not possible to reach
                     textViewAdvice.setText("Stop! Out of time!");
-//                    textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed));
                     textViewAdviceSpeed.setText("0");
                 } else if(adviceSpeed > currentSpeed){
                     //still enough time to reach, but need to speed up
@@ -659,7 +654,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 } else if(adviceSpeed > upperLimit){
                     //The light will soon be green
                     textViewAdvice.setText("Speed up! But pay attention to maximum speed!");
-//                    textViewAdviceSpeed.setText(String.format("%.2f km/h",adviceSpeed));
                     textViewAdviceSpeed.setText(String.format("%.2f",upperLimit));
                 } else{
                     if(adviceSpeed < currentSpeed){

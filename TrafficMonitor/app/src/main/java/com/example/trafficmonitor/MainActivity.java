@@ -1,7 +1,5 @@
 package com.example.trafficmonitor;
 
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -22,15 +20,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
-import android.text.method.HideReturnsTransformationMethod;
-import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -39,7 +33,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -65,10 +58,7 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -100,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     // Traffic light timer parameters
     HashMap<String, Integer> _m_imageResource_trafficLights;
-    //private HashMap<String, Integer> _m_idDictionary;
     private CountDownTimer _m_timer;
     private boolean _m_timeCleared = false;
     private long _m_timeLeft = 0;
@@ -223,8 +212,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Traffic Monitor");
         getSupportActionBar().hide();
-        //ActionBar ab = getSupportActionBar();
-        //ab.setDisplayHomeAsUpEnabled(true);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
@@ -317,7 +304,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         _s_instance = this;
         _m_polylines = new ArrayList<>();
-        //_m_idDictionary = new HashMap<>();
         _m_imageResource_trafficLights = new HashMap<>();
         _m_imageResource_trafficLights.put("STOP_AND_REMAIN", R.drawable.red);
         _m_imageResource_trafficLights.put("PRE_MOVEMENT", R.drawable.red_yellow);
@@ -344,7 +330,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         _m_gMap.setMyLocationEnabled(true);
         View locationButton = ((View) findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
-        //RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
         RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(locationButton.getLayoutParams().width, locationButton.getLayoutParams().height);
         // position on right bottom
         rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
@@ -389,8 +374,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             if(_m_autoCamera){
                 _m_gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 19f));
             }
-            //add speed information on the current location
-
             Log.i("Current Speed", String.format("%.1f km/h",currentSpeed));
             Marker markerCurrent = _m_gMap.addMarker(new MarkerOptions()
                     .position(currentLatLng).alpha(0.0f)
@@ -420,8 +403,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if ((int)distance > 50){
                     _m_determinated = false;
                     adviceDialog.hide();
-                    //LinearLayout popupGroup = findViewById(R.id.mainPopupGroup);
-                    //popupGroup.setVisibility(View.GONE);
                 }
             }
         }
@@ -573,10 +554,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         Log.d("Determination", "Result lane ID: "+determinatedLaneId+" signal group ID: "+determinatedSignalGroupId+" maneuvers: "+determinatedManeuvers.size());
 
-        //TextView textViewLane = findViewById(R.id.mainTextViewLane);
-        //textViewLane.setText("Lane ID: " + determinatedLaneId);
-        //TextView textViewSignalGroup = findViewById(R.id.mainTextViewSignalGroup);
-        //textViewSignalGroup.setText("Signal Group: " + determinatedSignalGroupId);
         String maneuvers = "";
         for(String maneuver : determinatedManeuvers){
             switch (maneuver){
@@ -591,23 +568,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     break;
             }
         }
-        //TextView textViewManeuvers = findViewById(R.id.mainTextViewManeuvers);
-        //textViewManeuvers.setText(maneuvers);
 
         showAdvicePobup();
         generateAdvice(currentSpeed, determinatedDistance, determinatedSignalGroupId);
-        //popupResult();
 
-    }
-
-    /*
-     * Input: none
-     * Return: none
-     * Description: pop up determination and advice result, with traffic light, maneuvers and advice speed
-     */
-    private void popupResult(){
-        LinearLayout popupGroup = findViewById(R.id.mainPopupGroup);
-        popupGroup.setVisibility(View.VISIBLE);
     }
 
     /*
@@ -714,21 +678,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         }
-
-
-        /*
-        float adviceSpeed = 0f;
-        if(adviceSpeed > 50 || adviceSpeed < 30){
-            textViewAdvice.setText("Stop");
-        } else {
-            if(adviceSpeed < currentSpeed){
-                textViewAdvice.setText("Slow Down");
-            } else if(adviceSpeed > currentSpeed){
-                textViewAdvice.setText("Speed Up");
-            }
-        }
-        textViewAdviceSpeed.setText(String.valueOf(adviceSpeed));
-         */
     }
 
     /*
@@ -758,8 +707,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 int seconds = (int) millisUntilFinished / 1000;
                 _m_current_timeLeft = seconds;
                 String timeLeftFormatted = String.format(Locale.getDefault(), "%02d", seconds);
-                //TextView textView = (TextView) findViewById(_m_idDictionary.get("timer"+signalGroupId));
-
                 TextView textViewTimer = (TextView) adviceDialog.findViewById(R.id.mainTextViewTimer);
                 textViewTimer.setText(timeLeftFormatted);
             }
@@ -846,7 +793,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         return state+":"+((long)timeLefts*1000);
     }
-    
+
     /*
      * Input: none
      * Return: none

@@ -30,7 +30,7 @@
         <service android:enabled="true"
             android:name=".ClientService"/>
         <receiver android:name=".LocationReceiver" />
-        <receiver android:name=".Notification_reciever" />
+        <receiver android:name=".NotificationReceiver" />
 
         <meta-data
             android:name="preloaded_fonts"

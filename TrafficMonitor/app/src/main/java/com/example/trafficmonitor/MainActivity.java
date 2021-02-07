@@ -3,11 +3,14 @@ package com.example.trafficmonitor;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -21,6 +24,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
@@ -142,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         settingsDialog = new Dialog(this);
         aboutDialog = new Dialog(this);
-        //initNotification();
+        initNotification();
 
         //Hide status Bar
         View overlay = findViewById(R.id.mainActivityLayout);
@@ -286,10 +290,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public void initNotification(){
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 00);
-        calendar.set(calendar.MINUTE, 8);
-        calendar.set(calendar.SECOND, 10);
-        Intent intent = new Intent(getApplicationContext(), Notification_reciever.class);
+        calendar.set(Calendar.HOUR_OF_DAY, 17);
+        calendar.set(calendar.MINUTE, 43);
+        calendar.set(calendar.SECOND, 30);
+        Intent intent = new Intent(getApplicationContext(), NotificationReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 100, intent, PendingIntent.FLAG_CANCEL_CURRENT);
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);

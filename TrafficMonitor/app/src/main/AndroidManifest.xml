@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.SET_ALARM" />
 
     <application
         android:allowBackup="true"
@@ -28,6 +29,7 @@
         <service android:enabled="true"
             android:name=".ClientService"/>
         <receiver android:name=".LocationReceiver" />
+        <receiver android:name=".Notification_reciever" />
 
         <meta-data
             android:name="preloaded_fonts"

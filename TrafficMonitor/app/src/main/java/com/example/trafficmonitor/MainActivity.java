@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -61,6 +62,7 @@ import com.karumi.dexter.listener.single.PermissionListener;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -117,8 +119,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private boolean _m_autoCamera = true;
     private boolean _m_determinated = false;
 
-    Dialog adviceDialog;
-    ImageView closeAdvicePopupImg;
+    Dialog adviceDialog, settingsDialog, aboutDialog;
+    ImageView closeAdvicePopupImg, closeSettingsWindowImg, closeAboutWindowImg;
+    Button buttonClear;
+    CheckBox drawPolylineCheckbox, autoCameraCheckbox;
+    ImageButton aboutButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,6 +139,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         _m_serviceIntent.putExtras(req);
         startService(_m_serviceIntent);
         bindService(_m_serviceIntent, _m_serviceConnection, BIND_AUTO_CREATE);
+
+        settingsDialog = new Dialog(this);
+        aboutDialog = new Dialog(this);
+        //initNotification();
+
+        //Hide status Bar
+        View overlay = findViewById(R.id.mainActivityLayout);
+        overlay.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                                        | View.SYSTEM_UI_FLAG_FULLSCREEN);
 
 
         Dexter.withContext(this)
@@ -183,8 +198,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         _m_imageButton_unfocus = _m_imageButtons[0];
         setModeFocus(_m_imageButton_unfocus, _m_imageButtons[1]);
         _m_mode_selected = _m_modes[1];
-
-        Button buttonClear = findViewById(R.id.mainButtonClear);
+/*
+        Button buttonClear = settingsDialog.findViewById(R.id.mainButtonClear);
         buttonClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -196,9 +211,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     _m_polylines.clear();
                 }
             }
-        });
+        });*/
 
-        CheckBox drawPolylineCheckbox = findViewById(R.id.mainCheckBoxDrawPolyline);
+        /*
+        CheckBox drawPolylineCheckbox = settingsDialog.findViewById(R.id.mainCheckBoxDrawPolyline);
         drawPolylineCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -215,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
-        CheckBox autoCameraCheckbox = findViewById(R.id.mainCheckBoxAutoCamera);
+        CheckBox autoCameraCheckbox = settingsDialog.findViewById(R.id.mainCheckBoxAutoCamera);
         autoCameraCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -227,24 +243,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
-
+*/
         ImageButton setImageButton = findViewById(R.id.mainImageButtonSet);
         setImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LinearLayout setGroup = findViewById(R.id.mainSetGroup);
-                setGroup.setVisibility(View.VISIBLE);
+                showSettings();
             }
         });
 
+        /*
         ImageButton exitSetImageButton = findViewById(R.id.mainImageButtonExitSet);
         exitSetImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LinearLayout setGroup = findViewById(R.id.mainSetGroup);
-                setGroup.setVisibility(View.GONE);
+                //LinearLayout setGroup = findViewById(R.id.mainSetGroup);
+                //setGroup.setVisibility(View.GONE);
             }
         });
+         */
 
         _s_instance = this;
         _m_polylines = new ArrayList<>();
@@ -256,6 +273,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         _m_imageResource_trafficLights.put("DARK", R.drawable.dark);
 
         adviceDialog = new Dialog(this);
+
+        aboutButton = findViewById(R.id.aboutButton);
+        aboutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showAboutDialog();
+            }
+        });
+
+    }
+
+    public void initNotification(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 00);
+        calendar.set(calendar.MINUTE, 8);
+        calendar.set(calendar.SECOND, 10);
+        Intent intent = new Intent(getApplicationContext(), Notification_reciever.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 100, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
     }
 
     @Override
@@ -278,6 +315,79 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
         adviceDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         adviceDialog.show();
+    }
+
+    public void showSettings(){
+        settingsDialog.setContentView(R.layout.settings_window);
+        closeSettingsWindowImg = (ImageView) settingsDialog.findViewById(R.id.closeSettingsWindow);
+        buttonClear = (Button) settingsDialog.findViewById(R.id.mainButtonClear);
+        drawPolylineCheckbox = (CheckBox) settingsDialog.findViewById(R.id.mainCheckBoxDrawPolyline);
+        autoCameraCheckbox = (CheckBox) settingsDialog.findViewById(R.id.mainCheckBoxAutoCamera);
+
+        closeSettingsWindowImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                settingsDialog.dismiss();
+            }
+        });
+
+        buttonClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(_m_gMap != null){
+                    for(Polyline line : _m_polylines)
+                    {
+                        line.remove();
+                    }
+                    _m_polylines.clear();
+                }
+            }
+        });
+
+        drawPolylineCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    _m_drawPolyline = true;
+                }else{
+                    _m_drawPolyline = false;
+                    for(Polyline line : _m_polylines)
+                    {
+                        line.remove();
+                    }
+                    _m_polylines.clear();
+                }
+            }
+        });
+
+        autoCameraCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    _m_autoCamera = true;
+                }else{
+                    _m_autoCamera = false;
+                }
+
+            }
+        });
+        settingsDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        settingsDialog.show();
+    }
+
+    public void showAboutDialog(){
+        aboutDialog.setContentView(R.layout.about_window);
+        closeAboutWindowImg = (ImageView) aboutDialog.findViewById(R.id.closeAboutWindow);
+
+        closeAboutWindowImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                aboutDialog.dismiss();
+            }
+        });
+        aboutDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        aboutDialog.show();
     }
 
     public class ClientReceiver extends BroadcastReceiver {

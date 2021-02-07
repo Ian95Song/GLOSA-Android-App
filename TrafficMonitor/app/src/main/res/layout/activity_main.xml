@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/mainActivityLayout"
     tools:context=".MainActivity">
     <include
         android:id="@+id/toolbar"
@@ -12,7 +13,7 @@
         android:id="@+id/map"
         class="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -30,205 +31,41 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginLeft="20dp"
-            app:srcCompat="@drawable/ic_action_name" />
+            app:srcCompat="@drawable/ic_action_name"
+            android:background="@drawable/button_round"/>
         <ImageButton
             android:id="@+id/mainImageButtonBicycle"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            app:srcCompat="@drawable/bicycle_icon" />
+            android:layout_marginLeft="20dp"
+            app:srcCompat="@drawable/bicycle_icon"
+            android:background="@drawable/button_round"/>
+
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="50dp"
             android:gravity="right" >
+
+            <ImageButton
+                android:id="@+id/aboutButton"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginRight="20dp"
+                app:srcCompat="@drawable/ic_baseline_info_24"
+                android:background="@drawable/button_round"/>
+
             <ImageButton
                 android:id="@+id/mainImageButtonSet"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:layout_marginRight="10dp"
-                app:srcCompat="@drawable/set_icon" />
-        </LinearLayout>
-    </LinearLayout>
-    <LinearLayout
-        android:id="@+id/mainSetGroup"
-        android:background="@color/white"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:gravity="right" >
-            <ImageButton
-                android:id="@+id/mainImageButtonExitSet"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
-                android:layout_gravity="right"
-                android:background="@color/white"
-                app:srcCompat="@drawable/exit_icon" />
-        </LinearLayout>
-        <TextView
-            android:id="@+id/mainTextViewPolyline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:text="Poly Line of Driving Track"
-            android:textColor="#000000"
-            android:textSize="14dp"
-            android:textStyle="bold"/>
-        <View android:layout_height="1px" android:background="#000000" android:layout_width="fill_parent"></View>
-        <LinearLayout
-            android:background="@color/white"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintStart_toStartOf="parent">
-            <CheckBox
-                android:id="@+id/mainCheckBoxDrawPolyline"
-                android:text="Draw"
-                android:checked="false"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/mainTextViewPolyline"
-                app:layout_constraintStart_toStartOf="parent"/>
-            <Button
-                android:id="@+id/mainButtonClear"
-                android:text="Clear"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"/>
-        </LinearLayout>
-        <TextView
-            android:id="@+id/mainTextViewCamera"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:text="Moving Camera"
-            android:textColor="#000000"
-            android:textSize="14dp"
-            android:textStyle="bold"/>
-        <View android:layout_height="1px" android:background="#000000" android:layout_width="fill_parent"></View>
-        <LinearLayout
-            android:background="@color/white"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintStart_toStartOf="parent">
-            <CheckBox
-                android:id="@+id/mainCheckBoxAutoCamera"
-                android:text="Automatic Camera"
-                android:checked="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/mainTextViewPolyline"
-                app:layout_constraintStart_toStartOf="parent"/>
+                android:layout_marginRight="20dp"
+                app:srcCompat="@drawable/set_icon"
+                android:background="@drawable/button_round"/>
+
+
         </LinearLayout>
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/mainPopupGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:orientation="horizontal"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar">
-
-        <ImageView
-            android:id="@+id/mainImageViewTrafficLight_1"
-            android:layout_width="128dp"
-            android:layout_height="150dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/red" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="10dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/mainTextViewLane"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Lane ID"
-                android:textColor="#000000"
-                android:textSize="14dp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/mainTextViewSignalGroup"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Signal Group"
-                android:textColor="#000000"
-                android:textSize="14dp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/mainTextViewTimer_1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="60"
-                android:textColor="#000000"
-                android:textSize="40dp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/mainTextViewManeuvers"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:text="Left, Straight, Right"
-                android:textColor="#000000"
-                android:textSize="14dp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/mainTextViewAdvice_1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Speed Up"
-                android:textColor="#000000"
-                android:textSize="14dp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Advice Speed:km/h"
-                android:textColor="#000000"
-                android:textSize="14dp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/mainTextViewAdviceSpeed_1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="50"
-                android:textColor="#000000"
-                android:textSize="40dp"
-                android:textStyle="bold" />
-        </LinearLayout>
-    </LinearLayout>
     <RelativeLayout
         android:id="@+id/mainLoadingPanel"
         android:layout_width="match_parent"

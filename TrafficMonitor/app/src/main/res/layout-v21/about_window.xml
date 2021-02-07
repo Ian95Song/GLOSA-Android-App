@@ -8,7 +8,7 @@
     android:gravity="center">
 
     <ImageView
-        android:id="@+id/closeAdvicePopup"
+        android:id="@+id/closeAboutWindow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:srcCompat="@drawable/ic_baseline_close_24"
@@ -22,6 +22,7 @@
         android:layout_height="wrap_content"
         app:cardCornerRadius="15dp"
         app:cardBackgroundColor="@color/Backgroundcolor"
+        app:cardUseCompatPadding="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true">
@@ -38,67 +39,60 @@
                 android:layout_marginTop="25dp"
                 android:layout_marginBottom="25dp">
 
-                <LinearLayout
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/mainTextViewTimer"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginLeft="20dp"
-                        android:layout_marginRight="20dp"
-                        android:textAlignment="center"
-                        android:textStyle="bold"
-                        android:gravity="center_vertical"
-                        android:textSize="50dp"
-                        android:text="60"/>
-
-                    <ImageView
-                        android:id="@+id/mainImageViewTrafficLight"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="20dp"
-                        android:layout_marginRight="20dp"
-                        android:layout_marginBottom="10dp"
-                        android:src="@drawable/green">
-                    </ImageView>
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginLeft="20dp"
-                        android:layout_marginRight="20dp"
-                        android:layout_marginBottom="10dp"
-                        android:src="@drawable/right">
-                    </ImageView>
-
-                </LinearLayout>
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginRight="0dp"
+                    android:textAlignment="center"
+                    android:textStyle="bold"
+                    android:textSize="25dp"
+                    android:textColor="@color/FhGcolor"
+                    android:text="@string/app_name"/>
 
                 <TextView
-                    android:id="@+id/mainTextViewAdvice"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
+                    android:layout_marginBottom="20dp"
                     android:textAlignment="center"
                     android:textStyle="bold"
-                    android:gravity="center_horizontal"
-                    android:textSize="30dp"
-                    android:text="TrafficMonitor Advice"/>
+                    android:textSize="18dp"
+                    android:text="@string/app_description"/>
 
                 <TextView
-                    android:id="@+id/mainTextViewAdviceSpeed"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
-                    android:textAlignment="center"
+                    android:layout_marginBottom="20dp"
+                    android:textAlignment="viewStart"
                     android:textStyle="bold"
-                    android:gravity="center_horizontal"
-                    android:textSize="60dp"
-                    android:text="180"/>
+                    android:textSize="18dp"
+                    android:text="This application was developed by:"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:textAlignment="viewStart"
+                    android:textStyle="italic"
+                    android:textSize="18dp"
+                    android:text="@string/institit_name"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="0dp"
+                    android:textAlignment="center"
+                    android:textStyle="normal"
+                    android:textSize="12dp"
+                    android:text="@string/copyright"/>
 
             </LinearLayout>
 

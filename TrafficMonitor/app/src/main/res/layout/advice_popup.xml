@@ -49,11 +49,12 @@
                         android:layout_height="match_parent"
                         android:layout_marginLeft="20dp"
                         android:layout_marginRight="20dp"
-                        android:textAlignment="center"
-                        android:textStyle="bold"
                         android:gravity="center_vertical"
+                        android:text="60"
+                        android:textAlignment="center"
                         android:textSize="50dp"
-                        android:text="60"/>
+                        android:textColor="@color/FhGcolor"
+                        android:textStyle="bold" />
 
                     <ImageView
                         android:id="@+id/mainImageViewTrafficLight"
@@ -66,12 +67,13 @@
                     </ImageView>
 
                     <ImageView
+                        android:id="@+id/drivingDirection"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_marginLeft="20dp"
                         android:layout_marginRight="20dp"
                         android:layout_marginBottom="10dp"
-                        android:src="@drawable/right">
+                        app:srcCompat="@drawable/straight_icon">
                     </ImageView>
 
                 </LinearLayout>

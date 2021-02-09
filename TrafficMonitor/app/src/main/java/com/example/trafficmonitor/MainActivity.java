@@ -767,8 +767,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     textViewAdviceSpeed.setText("0");
                 } else if(adviceSpeed > upperLimit){
                     //The light will soon be green
-                    textViewAdvice.setText("Speed up! But pay attention to maximum speed!");
-                    textViewAdviceSpeed.setText(String.format("%.2f",upperLimit));
+                    textViewAdvice.setText("Keep your speed! Green light is coming!");
+                    textViewAdviceSpeed.setText(String.format("%.2f",currentSpeed));
                 } else{
                     if(adviceSpeed < currentSpeed){
                         //still a long time to wait for green light, but not too long
@@ -776,11 +776,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         textViewAdviceSpeed.setText(String.format("%.2f",adviceSpeed));
                     } else if(adviceSpeed > currentSpeed){
                         //The light will soon be green, but no too soon
-                        textViewAdvice.setText("Speed up! Greening light is coming！");
+                        textViewAdvice.setText("Speed up! Green light is coming!");
                         textViewAdviceSpeed.setText(String.format("%.2f",adviceSpeed));
                     }else if(adviceSpeed == currentSpeed){
                         //The light will soon be green, but no too soon
-                        textViewAdvice.setText("Keep your speed! Greening light is coming！");
+                        textViewAdvice.setText("Keep your speed! Green light is coming!");
                         textViewAdviceSpeed.setText(String.format("%.2f",adviceSpeed));
                     }
                 }

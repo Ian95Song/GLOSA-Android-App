@@ -88,6 +88,30 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:textAlignment="viewStart"
+                    android:textStyle="bold"
+                    android:textSize="18dp"
+                    android:text="Source of the traffic light image:"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:textAlignment="viewStart"
+                    android:textStyle="italic"
+                    android:textSize="18dp"
+                    android:text="http://silentsai.blogspot.com/"/>
+
+
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
                     android:layout_marginBottom="0dp"
                     android:textAlignment="center"
                     android:textStyle="normal"

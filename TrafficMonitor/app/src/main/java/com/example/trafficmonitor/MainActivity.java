@@ -327,7 +327,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         buttonClear = (Button) settingsDialog.findViewById(R.id.mainButtonClear);
         drawPolylineCheckbox = (CheckBox) settingsDialog.findViewById(R.id.mainCheckBoxDrawPolyline);
         autoCameraCheckbox = (CheckBox) settingsDialog.findViewById(R.id.mainCheckBoxAutoCamera);
-
+        drawPolylineCheckbox.setChecked(_m_drawPolyline);
+        autoCameraCheckbox.setChecked(_m_autoCamera);
         closeSettingsWindowImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -349,7 +350,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
         drawPolylineCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
-
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){

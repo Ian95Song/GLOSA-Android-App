@@ -772,11 +772,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 } else{
                     if(adviceSpeed < currentSpeed){
                         //still a long time to wait for green light, but not too long
-                        textViewAdvice.setText("Slow down! Still a long time before green!");
+                        textViewAdvice.setText("Slow down! Still time before green!");
                         textViewAdviceSpeed.setText(String.format("%.2f",adviceSpeed));
                     } else if(adviceSpeed > currentSpeed){
                         //The light will soon be green, but no too soon
-                        textViewAdvice.setText("Speed up! Green light is coming!");
+                        textViewAdvice.setText("Keep your speed! Green light is coming!");
                         textViewAdviceSpeed.setText(String.format("%.2f",adviceSpeed));
                     }else if(adviceSpeed == currentSpeed){
                         //The light will soon be green, but no too soon
